@@ -8,7 +8,6 @@ import preprocessing.ClassDependencies;
 import preprocessing.ClassPacket;
 import preprocessing.Parser;
 import visualisation.Visualiser;
-
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -16,6 +15,7 @@ public class Main extends Application {
 
 	//Do not use this method
 	public static void main(String[] args) {
+		System.out.print("cherry has pushed apples into a bag of oranges");
 		launch(args);
 	}
 
