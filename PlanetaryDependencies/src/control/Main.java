@@ -15,7 +15,6 @@ public class Main extends Application {
 
 	//Do not use this method
 	public static void main(String[] args) {
-		System.out.print("cherry has pushed apples into a bag of oranges");
 		launch(args);
 	}
 
