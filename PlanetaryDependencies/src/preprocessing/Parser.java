@@ -66,35 +66,68 @@ public class Parser {
 								new ClassPacket(javaClassFile.getName().split("\\.")[0], 
 										cu.getPackage().getName().getName(), 
 										cu.getEndLine());
-						//Import adding
-						List<ImportDeclaration> imports = cu.getImports();
-						for(ImportDeclaration i : imports){
-							if(listCheck(i.getName().getName(),classList)){
-								cp.addToImported(i.getName().getName());
+						
+						//i think this is no longer necessary
+//						//Import adding
+//						List<ImportDeclaration> imports = cu.getImports();
+//						for(ImportDeclaration i : imports){
+//							if(existsInList(i.getName().getName(),classList)){
+//								cp.addToDependency(i.getName().getName());
+//							}
+//						}
+						//run visitor
+						VariableVisitor vv = new VariableVisitor();
+						List<TypeDeclaration> f_vars = cu.getTypes();
+						for (TypeDeclaration type : f_vars)
+						{
+							List<BodyDeclaration> members = type.getMembers();
+							for (BodyDeclaration member : members)
+							{
+								if (member instanceof FieldDeclaration)
+								{
+									FieldDeclaration myType = (FieldDeclaration) member;
+									if(existsInList(myType.getType().toString(),classList)){
+										vv.instantiated.add(myType.getType().toString());
+									}
+								}
 							}
 						}
-
-						//instantiated Adding
-						VariableVisitor vv = new VariableVisitor();
 						vv.visit(cu, null);
+						
+						//instantiated Adding and general dependency adding
 						for(String s : vv.instantiated){
-							if(listCheck(s, classList)){
+							if(existsInList(s, classList)){
 								cp.addToInstantiated(s);
 							}
-						}
-						//Main.
+							else if(s.contains("<")&&s.contains(">")){
+								int start = s.indexOf('<');
+								int end = s.indexOf('>');
+								String collection = s.substring(0, start);
+								String type = s.substring(start+1, end);
+								if(existsInList(type, classList)){
+									cp.addToDependency(type);
+								}
+								else if(existsInList(collection, classList)){
+									cp.addToDependency(collection);
+
+								}
+							}
+						};
+
 						//static access
 						for(TypeDeclaration type : cu.getTypes()){
 							List<BodyDeclaration> bodyList = type.getMembers();
 							for(BodyDeclaration bd : bodyList){
 								for(String cName : classList){
 									if(bd.toString().contains(cName+".")){
-//										System.out.println("Static Access:"+cName);
+										//										System.out.println("Static Access:"+cName);
 										cp.addToStaticAccess(cName);
 									}
 								}
 							}
 						}
+						
+						
 						parsedList.add(cp);
 
 					} catch (ParseException e) {
@@ -122,7 +155,7 @@ public class Parser {
 			instantiated.add(n.getType().toString());
 		}
 	}
-	private static boolean listCheck(String name, ArrayList<String> classList) {
+	private static boolean existsInList(String name, ArrayList<String> classList) {
 		for(String s : classList){
 			if(name.equals(s))return true;
 		}

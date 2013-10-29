@@ -56,12 +56,24 @@ public class Analyser {
 			classesThatDependOnDependentClass = findAllClassesThatInstantiate(dependentClass);
 			dependency.dependentOn = dependentClass;
 			if(classesThatDependOnDependentClass.size() < 3){
-				if(classesThatDependOnDependentClass.get(0) == packetName || classesThatDependOnDependentClass.size() == 1){
+				if(classesThatDependOnDependentClass.get(0).equals(packetName) || classesThatDependOnDependentClass.size() == 1){
 					dependency.associationType =  ClassDependencies.COMPOSITION;
 				}
 			}else {
 				dependency.associationType =  ClassDependencies.AGGREGATION;
 			}
+			classDependency.associations.add(dependency);
+		}
+		for(String dependentClass : packet.staticAccess){
+			dependency = classDependency.new Association();
+			dependency.dependentOn = dependentClass;
+			dependency.associationType = ClassDependencies.REALIZATION;
+			classDependency.associations.add(dependency);
+		}
+		for(String dependentClass : packet.dependencies){
+			dependency = classDependency.new Association();
+			dependency.dependentOn = dependentClass;
+			dependency.associationType = ClassDependencies.DEPENDENCY;
 			classDependency.associations.add(dependency);
 		}
 		return classDependency;

@@ -6,10 +6,10 @@ public class ClassDependencies {
 	
 	public static int COMPOSITION = 0;
 	public static int AGGREGATION = 1;
-	public static int DEPENDENCY = 2;
-
-	public static int UNIDIRECTIONAL = 3;
-	public static int BIDIRECTIONAL = 4;
+	public static int REALIZATION = 2;
+	public static int DEPENDENCY = 3;
+	public static int UNIDIRECTIONAL = 4;
+	public static int BIDIRECTIONAL = 5;
 
 	public String className;
 	public String packageName;
