@@ -3,7 +3,7 @@ package preprocessing;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import preprocessing.ClassDependencies.Dependency;
+import preprocessing.ClassDependencies.Association;
 
 
 public class Analyser {
@@ -18,16 +18,16 @@ public class Analyser {
 	 *  Ready made ClassPackets for testing
 	 */
 	public static void makeTestPackets(){
-		ClassPacket packet1 = new ClassPacket("Pop");
+		ClassPacket packet1 = new ClassPacket("Pop", "DrinksPackage", 100);
 		Collections.addAll(packet1.instantiated,"Table","Chair","Apple","Moose","Squid","MapleTree","Saturn","RocketChair");
 		allClassPackets.add(packet1);	
-		ClassPacket packet2 = new ClassPacket("Apple");
+		ClassPacket packet2 = new ClassPacket("Apple", "FruitsPackage", 200);
 		Collections.addAll(packet2.instantiated,"Moose","Pop","Orange","KoolAid","Tiger","AlexFraser","MoonHouse","RocketChair");
 		allClassPackets.add(packet2);
-		ClassPacket packet3 = new ClassPacket("Tiger");
+		ClassPacket packet3 = new ClassPacket("Tiger", "AnimalsPackage", 1000);
 		Collections.addAll(packet3.instantiated,"Ranger","Pop","Apple","Car","Poop","Tree","Pluto","FaceTurtle");
 		allClassPackets.add(packet3);
-		ClassPacket packet4 = new ClassPacket("Hat");
+		ClassPacket packet4 = new ClassPacket("Hat", "ClothingPackage", 20);
 		Collections.addAll(packet4.instantiated,"Mango","Tiger","Watermelon","Moose","Apple","Maple","Yoghurt");
 		allClassPackets.add(packet4);
 				
@@ -43,19 +43,19 @@ public class Analyser {
 		ClassDependencies classDependency = new ClassDependencies(packetName); 
 		ArrayList<String> classesThatDependOnDependentClass;
 		ArrayList<String> instantiated = packet.instantiated;
-		Dependency dependency;
+		Association dependency;
 		for(String dependentClass: instantiated){
-			dependency = classDependency.new Dependency();
+			dependency = classDependency.new Association();
 			classesThatDependOnDependentClass = findAllClassesThatInstantiate(dependentClass);
 			dependency.dependentOn = dependentClass;
 			if(classesThatDependOnDependentClass.size() < 3){
 				if(classesThatDependOnDependentClass.get(1) == packetName || classesThatDependOnDependentClass.size() == 1){
-					dependency.dependencyType =  ClassDependencies.COMPOSITION;
+					dependency.associationType =  ClassDependencies.COMPOSITION;
 			}
 		}else {
-			dependency.dependencyType =  ClassDependencies.AGGREGATION;
+			dependency.associationType =  ClassDependencies.AGGREGATION;
 		}
-			classDependency.dependencies.add(dependency);
+			classDependency.associations.add(dependency);
 		}
 		return classDependency;
 	}
@@ -87,9 +87,9 @@ public class Analyser {
 		}
 		return listOfClasses;
 	}
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-	}
+//	public static void main(String[] args) {
+//		// TODO Auto-generated method stub
+//	}
 
 	public static ArrayList<ClassDependencies> analyse(ArrayList<ClassPacket> parserOutput) {
 		// TODO complete analysis tool. Feel free to use helper methods, submethods, custom classes, etc. 

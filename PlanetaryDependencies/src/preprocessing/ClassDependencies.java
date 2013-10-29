@@ -13,11 +13,11 @@ public class ClassDependencies {
 
 	String className;
 	String packageName;
-	ArrayList<Dependency> dependencies;
+	ArrayList<Association> associations;
 	
 	public ClassDependencies(String name){
 		className = name;
-		dependencies = new ArrayList<Dependency>();
+		associations = new ArrayList<Association>();
 	}
 
 	//to be used in the future
@@ -27,9 +27,9 @@ public class ClassDependencies {
 	int planetaryRadius;
 	boolean orbitsClockwise;
 	
-	public class Dependency{
+	public class Association{
 		String dependentOn;
-		int dependencyType;
-		int dependenyDirection;
+		int associationType;
+		int associationDirection;
 	}
 }
