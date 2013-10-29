@@ -33,6 +33,9 @@ public class Main extends Application {
 															//returns a list of ClassDependencies
 		
 		Visualiser.process(analyserOutput);					//Takes in a list of ClassDependencies, returns nothing.
+		
+		//Basic way to shutdown the application. To be worked on.
+		System.exit(0);
 	}
 
 }
