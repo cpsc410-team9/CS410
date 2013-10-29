@@ -11,25 +11,26 @@ public class ClassDependencies {
 	public static int UNIDIRECTIONAL = 3;
 	public static int BIDIRECTIONAL = 4;
 
-	String className;
-	String packageName;
-	ArrayList<Association> associations;
+	public String className;
+	public String packageName;
+	public ArrayList<Association> associations;
 	
 	public ClassDependencies(String name){
 		className = name;
 		associations = new ArrayList<Association>();
 	}
+	
+	public int planetaryRadius;
 
 	//to be used in the future
 	
 	int orbitalRadius;
 	int Color;
-	int planetaryRadius;
 	boolean orbitsClockwise;
 	
 	public class Association{
-		String dependentOn;
-		int associationType;
-		int associationDirection;
+		public String dependentOn;
+		public int associationType;
+		public int associationDirection;
 	}
 }

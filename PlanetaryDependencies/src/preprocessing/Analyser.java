@@ -12,8 +12,8 @@ public class Analyser {
 	 * @param args
 	 */
 	public static ArrayList<ClassPacket> allClassPackets = new ArrayList<ClassPacket>();
-	
-	
+
+
 	/**
 	 *  Ready made ClassPackets for testing
 	 */
@@ -30,15 +30,22 @@ public class Analyser {
 		ClassPacket packet4 = new ClassPacket("Hat", "ClothingPackage", 20);
 		Collections.addAll(packet4.instantiated,"Mango","Tiger","Watermelon","Moose","Apple","Maple","Yoghurt");
 		allClassPackets.add(packet4);
-				
+
 	}
-	
-	
+
+
 	/** This is the primary method to find the composition dependencies, and it uses the other methods as helpers
 	 * @param packet
 	 * @return ClassDependencies for the packet
 	 */
 	public static ClassDependencies findCompositionDependency(ClassPacket packet){
+		/*
+		 * Shawn: This method is looking good, but if you take a look at the implementation i suggested,
+		 * we should refactor this to "findDependencies" and categorize all the associations we find at the same time. 
+		 * 
+		 * 
+		 */
+		
 		String packetName = packet.className;
 		ClassDependencies classDependency = new ClassDependencies(packetName); 
 		ArrayList<String> classesThatDependOnDependentClass;
@@ -49,17 +56,17 @@ public class Analyser {
 			classesThatDependOnDependentClass = findAllClassesThatInstantiate(dependentClass);
 			dependency.dependentOn = dependentClass;
 			if(classesThatDependOnDependentClass.size() < 3){
-				if(classesThatDependOnDependentClass.get(1) == packetName || classesThatDependOnDependentClass.size() == 1){
+				if(classesThatDependOnDependentClass.get(0) == packetName || classesThatDependOnDependentClass.size() == 1){
 					dependency.associationType =  ClassDependencies.COMPOSITION;
+				}
+			}else {
+				dependency.associationType =  ClassDependencies.AGGREGATION;
 			}
-		}else {
-			dependency.associationType =  ClassDependencies.AGGREGATION;
-		}
 			classDependency.associations.add(dependency);
 		}
 		return classDependency;
 	}
-	
+
 	/**
 	 *  Sorts the instantiated classes for quicker searching
 	 */
@@ -68,7 +75,7 @@ public class Analyser {
 			Collections.sort(classPacket.instantiated);
 		}
 	}
-	
+
 	/**
 	 * @param name (Class Name for which you want to find all other classes that instantiate this one)
 	 * @return ArrayList of the classes which instantiates the input class, the first element is the input class
@@ -87,9 +94,9 @@ public class Analyser {
 		}
 		return listOfClasses;
 	}
-//	public static void main(String[] args) {
-//		// TODO Auto-generated method stub
-//	}
+	//	public static void main(String[] args) {
+	//		// TODO Auto-generated method stub
+	//	}
 
 	public static ArrayList<ClassDependencies> analyse(ArrayList<ClassPacket> parserOutput) {
 		// TODO complete analysis tool. Feel free to use helper methods, submethods, custom classes, etc. 
@@ -97,6 +104,12 @@ public class Analyser {
 		System.out.println("Analyser started.");
 
 		ArrayList<ClassDependencies> output = new ArrayList<ClassDependencies>();
+		for(ClassPacket cp : parserOutput){
+			ClassDependencies temp = findCompositionDependency(cp);
+			temp.planetaryRadius = cp.lineCount;
+			temp.packageName = cp.packageName;
+			output.add(temp);
+		}
 		return output;
 
 	}

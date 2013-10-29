@@ -20,12 +20,15 @@ public class ClassPacket {
 		instantiated = new ArrayList<String>();
 	}
 	public void addToImported(String newClass){
-		imported.add(newClass);
+		if (!imported.contains(newClass))
+			imported.add(newClass);
 	}
 	public void addToStaticAccess(String newClass){
-		staticAccess.add(newClass);
+		if(!staticAccess.contains(newClass))
+			staticAccess.add(newClass);
 	}
 	public void addToInstantiated(String newClass){
-		instantiated.add(newClass);
+		if(!instantiated.contains(newClass))
+			instantiated.add(newClass);
 	}
 }
