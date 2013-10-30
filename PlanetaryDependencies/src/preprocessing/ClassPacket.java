@@ -7,7 +7,7 @@ public class ClassPacket {
 	public String className;
 	public String packageName;
 	public int lineCount;
-	public ArrayList<String> dependencies;
+	public ArrayList<String> associatedWith;
 	public ArrayList<String> staticAccess;
 	public ArrayList<String> instantiated;
 	
@@ -15,13 +15,13 @@ public class ClassPacket {
 		className = name;
 		packageName = pName;
 		lineCount = count;
-		dependencies = new ArrayList<String>();
+		associatedWith = new ArrayList<String>();
 		staticAccess = new ArrayList<String>();
 		instantiated = new ArrayList<String>();
 	}
-	public void addToDependency(String newClass){
-		if (!dependencies.contains(newClass))
-			dependencies.add(newClass);
+	public void addToAssociatedWith(String newClass){
+		if (!associatedWith.contains(newClass))
+			associatedWith.add(newClass);
 	}
 	public void addToStaticAccess(String newClass){
 		if(!staticAccess.contains(newClass))

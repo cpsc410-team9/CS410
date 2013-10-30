@@ -4,20 +4,20 @@ import java.util.ArrayList;
 
 import control.Main;
 
-import preprocessing.ClassDependencies;
-import preprocessing.ClassDependencies.Association;
+import preprocessing.ClassDependency;
+import preprocessing.ClassDependency.Association;
 import preprocessing.ClassPacket;
 
 public class Visualiser {
 	public static ClassPacket test;
 
-	public static void process(ArrayList<ClassDependencies> analyserOutput) {
+	public static void process(ArrayList<ClassDependency> analyserOutput) {
 		
 		// TODO perform full rendering ultimately, for now, use this to perform text output.
 		System.out.println();
 		System.out.println("Visualiser started.");
 
-		for(ClassDependencies cd : analyserOutput){
+		for(ClassDependency cd : analyserOutput){
 			System.out.println("-------------------Scanning Planet-----------------");
 			System.out.println("Planet: "+cd.className);
 			System.out.println("  Planet radius: "+cd.planetaryRadius);
@@ -28,7 +28,7 @@ public class Visualiser {
 			else{
 				System.out.println("  Associated with:");
 				for(Association a : cd.associations){
-					System.out.print("  - "+a.dependentOn+", Association Type: ");
+					System.out.print("  - "+a.associatedWith+", Association Type: ");
 					switch(a.associationType){
 					case 0:
 						System.out.println("COMPOSITION");
@@ -40,13 +40,10 @@ public class Visualiser {
 						System.out.println("REALIZATION");
 						break;
 					case 3:
-						System.out.println("GENERAL DEPENDENCY");
+						System.out.println("UNI-DIRECTIONAL ASSOCIATION");
 						break;
 					case 4:
-						System.out.println("UNI-DIRECTIONAL");
-						break;
-					case 5:
-						System.out.println("BI-DIRECTIONAL");
+						System.out.println("BI-DIRECTIONAL ASSOCIATION");
 						break;
 
 					}

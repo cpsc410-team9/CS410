@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import preprocessing.Analyser;
-import preprocessing.ClassDependencies;
+import preprocessing.ClassDependency;
 import preprocessing.ClassPacket;
 import preprocessing.Parser;
 import visualisation.Visualiser;
@@ -28,7 +28,7 @@ public class Main extends Application {
 		parserOutput = parser.parse(new File(uri));			//parser takes in a file as input, returns a list of ClassPackets
 		
 		//use arrayList in analyser
-		ArrayList<ClassDependencies> analyserOutput;
+		ArrayList<ClassDependency> analyserOutput;
 		analyserOutput = Analyser.analyse(parserOutput);	//Analyser takes in a list of ClassPackets as input,
 															//returns a list of ClassDependencies
 		

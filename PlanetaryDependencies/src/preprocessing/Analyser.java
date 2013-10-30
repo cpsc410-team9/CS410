@@ -3,7 +3,7 @@ package preprocessing;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import preprocessing.ClassDependencies.Association;
+import preprocessing.ClassDependency.Association;
 
 
 public class Analyser {
@@ -33,50 +33,73 @@ public class Analyser {
 
 	}
 
+	private static ClassDependency generateClassDependencyObject(
+			ClassPacket cp) {
+		ClassDependency classDependency = new ClassDependency(cp.className);
+		classDependency.planetaryRadius = cp.lineCount;
+		classDependency.packageName = cp.packageName;
+		
+		findCompositionDependency(cp, classDependency);
+		findRealizationDependency(cp, classDependency);
+		findDirectionalAssocation(cp, classDependency);
+		
+		return classDependency;
+	}
+	
+	/**
+	 * Given a packet, there are three lists contained in the packet. 
+	 * Your job is to find out if a dependency is bi-directional or unidirectional.
+	 * 
+	 * 1. for each item in the list 'ASSOCIATEDWITH'
+	 * 	a. create an association,
+	 * 	b. fill in relevant information about the association.
+	 * 	c. check the class it is associated to and see if it is also associated with this item.
+	 * 		c1. if true, set associationtype to bi-directional
+	 * 			else, set to unidirectional.
+	 *	d. add the completed association to the classDependency object's list of associations. 
+	 *
+	 * @param packet
+	 * @param classDependency
+	 */
+	private static void findDirectionalAssocation(ClassPacket packet,
+			ClassDependency classDependency) {
+		// TODO add items to classDependency.associations
+	
+	}
+
+	private static void findRealizationDependency(ClassPacket packet,
+			ClassDependency classDependency) {
+		Association association;
+		for(String dependentClass : packet.staticAccess){
+			association = classDependency.new Association();
+			association.associatedWith = dependentClass;
+			association.associationType = ClassDependency.REALIZATION;
+			classDependency.associations.add(association);
+		}		
+	}
 
 	/** This is the primary method to find the composition dependencies, and it uses the other methods as helpers
 	 * @param packet
 	 * @return ClassDependencies for the packet
 	 */
-	public static ClassDependencies findCompositionDependency(ClassPacket packet){
-		/*
-		 * Shawn: This method is looking good, but if you take a look at the implementation i suggested,
-		 * we should refactor this to "findDependencies" and categorize all the associations we find at the same time. 
-		 * 
-		 * 
-		 */
-		
+	public static void findCompositionDependency(ClassPacket packet, ClassDependency classDependency){
 		String packetName = packet.className;
-		ClassDependencies classDependency = new ClassDependencies(packetName); 
 		ArrayList<String> classesThatDependOnDependentClass;
 		ArrayList<String> instantiated = packet.instantiated;
-		Association dependency;
+		Association association;
 		for(String dependentClass: instantiated){
-			dependency = classDependency.new Association();
+			association = classDependency.new Association();
 			classesThatDependOnDependentClass = findAllClassesThatInstantiate(dependentClass);
-			dependency.dependentOn = dependentClass;
+			association.associatedWith = dependentClass;
 			if(classesThatDependOnDependentClass.size() < 3){
 				if(classesThatDependOnDependentClass.get(0).equals(packetName) || classesThatDependOnDependentClass.size() == 1){
-					dependency.associationType =  ClassDependencies.COMPOSITION;
+					association.associationType =  ClassDependency.COMPOSITION;
 				}
 			}else {
-				dependency.associationType =  ClassDependencies.AGGREGATION;
+				association.associationType =  ClassDependency.AGGREGATION;
 			}
-			classDependency.associations.add(dependency);
+			classDependency.associations.add(association);
 		}
-		for(String dependentClass : packet.staticAccess){
-			dependency = classDependency.new Association();
-			dependency.dependentOn = dependentClass;
-			dependency.associationType = ClassDependencies.REALIZATION;
-			classDependency.associations.add(dependency);
-		}
-		for(String dependentClass : packet.dependencies){
-			dependency = classDependency.new Association();
-			dependency.dependentOn = dependentClass;
-			dependency.associationType = ClassDependencies.DEPENDENCY;
-			classDependency.associations.add(dependency);
-		}
-		return classDependency;
 	}
 
 	/**
@@ -110,20 +133,22 @@ public class Analyser {
 	//		// TODO Auto-generated method stub
 	//	}
 
-	public static ArrayList<ClassDependencies> analyse(ArrayList<ClassPacket> parserOutput) {
+	public static ArrayList<ClassDependency> analyse(ArrayList<ClassPacket> parserOutput) {
 		// TODO complete analysis tool. Feel free to use helper methods, submethods, custom classes, etc. 
 		// but this has to be the ultimate returning function.
 		System.out.println("Analyser started.");
 
-		ArrayList<ClassDependencies> output = new ArrayList<ClassDependencies>();
+		ArrayList<ClassDependency> output = new ArrayList<ClassDependency>();
 		for(ClassPacket cp : parserOutput){
-			ClassDependencies temp = findCompositionDependency(cp);
-			temp.planetaryRadius = cp.lineCount;
-			temp.packageName = cp.packageName;
+			ClassDependency temp = generateClassDependencyObject(cp);
+			
 			output.add(temp);
 		}
 		return output;
 
 	}
+
+
+	
 
 }

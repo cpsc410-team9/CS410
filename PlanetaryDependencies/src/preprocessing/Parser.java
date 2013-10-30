@@ -94,7 +94,7 @@ public class Parser {
 						}
 						vv.visit(cu, null);
 						
-						//instantiated Adding and general dependency adding
+						//instantiated Adding and association adding
 						for(String s : vv.instantiated){
 							if(existsInList(s, classList)){
 								cp.addToInstantiated(s);
@@ -105,15 +105,36 @@ public class Parser {
 								String collection = s.substring(0, start);
 								String type = s.substring(start+1, end);
 								if(existsInList(type, classList)){
-									cp.addToDependency(type);
+									cp.addToAssociatedWith(type);
 								}
 								else if(existsInList(collection, classList)){
-									cp.addToDependency(collection);
+									cp.addToAssociatedWith(collection);
 
 								}
 							}
 						};
 
+						//more associations
+						MethodVisitor mv = new MethodVisitor();
+						mv.visit(cu, null);
+						for(String s : mv.methods){
+							if(existsInList(s, classList)){
+								cp.addToAssociatedWith(s);
+							}
+							else if(s.contains("<")&&s.contains(">")){
+								int start = s.indexOf('<');
+								int end = s.indexOf('>');
+								String collection = s.substring(0, start);
+								String type = s.substring(start+1, end);
+								if(existsInList(type, classList)){
+									cp.addToAssociatedWith(type);
+								}
+								else if(existsInList(collection, classList)){
+									cp.addToAssociatedWith(collection);
+
+								}
+							}
+						};
 						//static access
 						for(TypeDeclaration type : cu.getTypes()){
 							List<BodyDeclaration> bodyList = type.getMembers();
@@ -152,9 +173,24 @@ public class Parser {
 		@Override
 		public void visit(VariableDeclarationExpr n, Object arg)
 		{      
+
 			instantiated.add(n.getType().toString());
 		}
 	}
+	
+	 public class MethodVisitor extends VoidVisitorAdapter {
+		 ArrayList<String> methods = new ArrayList<String>();
+	        public void visit(MethodDeclaration n, Object arg)
+	        {
+	        	List<Parameter> params = n.getParameters();
+	        	if(params!=null){
+	        		for(Parameter p : params){
+	        			methods.add(p.getType().toString());
+	        		}
+	        	}
+	        }
+	  }
+	 
 	private static boolean existsInList(String name, ArrayList<String> classList) {
 		for(String s : classList){
 			if(name.equals(s))return true;
