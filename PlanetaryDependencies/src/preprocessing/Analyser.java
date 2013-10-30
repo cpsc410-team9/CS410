@@ -14,24 +14,24 @@ public class Analyser {
 	public static ArrayList<ClassPacket> allClassPackets = new ArrayList<ClassPacket>();
 
 
-	/**
-	 *  Ready made ClassPackets for testing
-	 */
-	public static void makeTestPackets(){
-		ClassPacket packet1 = new ClassPacket("Pop", "DrinksPackage", 100);
-		Collections.addAll(packet1.instantiated,"Table","Chair","Apple","Moose","Squid","MapleTree","Saturn","RocketChair");
-		allClassPackets.add(packet1);	
-		ClassPacket packet2 = new ClassPacket("Apple", "FruitsPackage", 200);
-		Collections.addAll(packet2.instantiated,"Moose","Pop","Orange","KoolAid","Tiger","AlexFraser","MoonHouse","RocketChair");
-		allClassPackets.add(packet2);
-		ClassPacket packet3 = new ClassPacket("Tiger", "AnimalsPackage", 1000);
-		Collections.addAll(packet3.instantiated,"Ranger","Pop","Apple","Car","Poop","Tree","Pluto","FaceTurtle");
-		allClassPackets.add(packet3);
-		ClassPacket packet4 = new ClassPacket("Hat", "ClothingPackage", 20);
-		Collections.addAll(packet4.instantiated,"Mango","Tiger","Watermelon","Moose","Apple","Maple","Yoghurt");
-		allClassPackets.add(packet4);
-
-	}
+//	/** 
+//	 *  Ready made ClassPackets for testing
+//	 */
+//	public static void makeTestPackets(){
+//		ClassPacket packet1 = new ClassPacket("Pop", "DrinksPackage", 100);
+//		Collections.addAll(packet1.instantiated,"Table","Chair","Apple","Moose","Squid","MapleTree","Saturn","RocketChair");
+//		allClassPackets.add(packet1);	
+//		ClassPacket packet2 = new ClassPacket("Apple", "FruitsPackage", 200);
+//		Collections.addAll(packet2.instantiated,"Moose","Pop","Orange","KoolAid","Tiger","AlexFraser","MoonHouse","RocketChair");
+//		allClassPackets.add(packet2);
+//		ClassPacket packet3 = new ClassPacket("Tiger", "AnimalsPackage", 1000);
+//		Collections.addAll(packet3.instantiated,"Ranger","Pop","Apple","Car","Poop","Tree","Pluto","FaceTurtle");
+//		allClassPackets.add(packet3);
+//		ClassPacket packet4 = new ClassPacket("Hat", "ClothingPackage", 20);
+//		Collections.addAll(packet4.instantiated,"Mango","Tiger","Watermelon","Moose","Apple","Maple","Yoghurt");
+//		allClassPackets.add(packet4);
+//
+//	}
 
 	private static ClassDependency generateClassDependencyObject(
 			ClassPacket cp) {
@@ -47,25 +47,30 @@ public class Analyser {
 	}
 	
 	/**
-	 * Given a packet, there are three lists contained in the packet. 
-	 * Your job is to find out if a dependency is bi-directional or unidirectional.
-	 * 
-	 * 1. for each item in the list 'ASSOCIATEDWITH'
-	 * 	a. create an association,
-	 * 	b. fill in relevant information about the association.
-	 * 	c. check the class it is associated to and see if it is also associated with this item.
-	 * 		c1. if true, set associationtype to bi-directional
-	 * 			else, set to unidirectional.
-	 *	d. add the completed association to the classDependency object's list of associations. 
-	 *
 	 * @param packet
 	 * @param classDependency
 	 */
 	private static void findDirectionalAssocation(ClassPacket packet,
 			ClassDependency classDependency) {
-		// TODO add items to classDependency.associations
-	
+		Association association;
+		for(String directionalAssociation : packet.associatedWith){
+			association = classDependency.new Association();
+			association.associatedWith = directionalAssociation;
+			for(ClassPacket classDependentOn : allClassPackets){
+				if(classDependentOn.className.equals(directionalAssociation)){
+					if(classDependentOn.associatedWith.contains(classDependency.className)){
+						association.associationType = ClassDependency.BIDIRECTIONAL_ASSOCIATION;
+					}
+					else{
+						association.associationType = ClassDependency.UNIDIRECTIONAL_ASSOCIATION;
+					};
+				}
+			}
+			
+			
+			classDependency.associations.add(association);
 	}
+}
 
 	private static void findRealizationDependency(ClassPacket packet,
 			ClassDependency classDependency) {
@@ -137,7 +142,10 @@ public class Analyser {
 		// TODO complete analysis tool. Feel free to use helper methods, submethods, custom classes, etc. 
 		// but this has to be the ultimate returning function.
 		System.out.println("Analyser started.");
-
+		for(ClassPacket cp : parserOutput){
+			allClassPackets.add(cp);
+		}
+		
 		ArrayList<ClassDependency> output = new ArrayList<ClassDependency>();
 		for(ClassPacket cp : parserOutput){
 			ClassDependency temp = generateClassDependencyObject(cp);
