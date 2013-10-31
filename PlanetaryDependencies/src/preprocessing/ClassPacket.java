@@ -10,6 +10,8 @@ public class ClassPacket {
 	public ArrayList<String> associatedWith;
 	public ArrayList<String> staticAccess;
 	public ArrayList<String> instantiated;
+	public ArrayList<String> assigned;
+	
 	
 	public ClassPacket(String name, String pName, int count){
 		className = name;
@@ -18,6 +20,7 @@ public class ClassPacket {
 		associatedWith = new ArrayList<String>();
 		staticAccess = new ArrayList<String>();
 		instantiated = new ArrayList<String>();
+		assigned = new ArrayList<String>();
 	}
 	public void addToAssociatedWith(String newClass){
 		if (!associatedWith.contains(newClass))
@@ -30,5 +33,9 @@ public class ClassPacket {
 	public void addToInstantiated(String newClass){
 		if(!instantiated.contains(newClass))
 			instantiated.add(newClass);
+	}
+	public void addToAssigned(String newClass) {
+		if(!assigned.contains(newClass))
+			assigned.add(newClass);		
 	}
 }

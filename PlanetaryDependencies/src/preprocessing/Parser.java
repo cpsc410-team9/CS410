@@ -28,169 +28,210 @@ import java.util.List;
 import control.Main;
 
 public class Parser {
-
+	ArrayList<ClassPacket> parsedList = new ArrayList<ClassPacket>();
+//	ArrayList<String> packageList = new ArrayList<String>();
+	ArrayList<String> classList = new ArrayList<String>();
+	
 	public ArrayList<ClassPacket> parse(File file) throws FileNotFoundException{
 		System.out.println("Parser started.");
 
-		ArrayList<ClassPacket> parsedList = new ArrayList<ClassPacket>();
-		ArrayList<String> packageList = new ArrayList<String>();
-		ArrayList<String> classList = new ArrayList<String>();
+
 		/*
 		 * Complete parsing method here
 		 */
 		//from project, find the src folder containing packages
 		System.out.println("Folder selected: "+file.getAbsolutePath());
 
-		File src = new File(file.getAbsolutePath()); 
-
+		File src = new File(file.getAbsolutePath());
+		for(File folder : src.listFiles()){
+			if(folder.getName().equals("src")&&folder.isDirectory()){
+				src = folder;
+			}
+		}
+		System.out.println(src.getAbsolutePath());
 
 		//first run to determine the list of everything.
-		for (File packages : src.listFiles()){
-			if (packages.isDirectory()) {
-				packageList.add(packages.getName());
-				for (File javaClassFile : packages.listFiles()) {
-					if (javaClassFile.getName().endsWith(".java")) {
-						String javaClassName = javaClassFile.getName().split(
-								"\\.")[0];
-						classList.add(javaClassName);
-					}
-				}
-			}
-		}
-
+		scanFolder(src);
 
 		//second run to parse data
-		for (File packages : src.listFiles()){
-			if(packages.isDirectory()){
-				for(File javaClassFile : packages.listFiles()){
-					if(javaClassFile.getName().endsWith(".java")){
-						try {
-							CompilationUnit cu = JavaParser.parse(javaClassFile);
-							ClassPacket cp = 
-									new ClassPacket(javaClassFile.getName().split("\\.")[0], 
-											cu.getPackage().getName().getName(), 
-											cu.getEndLine());
-							
-							//i think this is no longer necessary
-//							//Import adding
-//							List<ImportDeclaration> imports = cu.getImports();
-//							for(ImportDeclaration i : imports){
-//								if(existsInList(i.getName().getName(),classList)){
-//									cp.addToDependency(i.getName().getName());
-//								}
-//							}
-							//run visitor
-							VariableVisitor vv = new VariableVisitor();
-							List<TypeDeclaration> f_vars = cu.getTypes();
-							for (TypeDeclaration type : f_vars)
-							{
-								List<BodyDeclaration> members = type.getMembers();
-								for (BodyDeclaration member : members)
-								{
-									if (member instanceof FieldDeclaration)
-									{
-										FieldDeclaration myType = (FieldDeclaration) member;
-										if(existsInList(myType.getType().toString(),classList)){
-											vv.instantiated.add(myType.getType().toString());
-										}
-									}
-								}
-							}
-							vv.visit(cu, null);
-							
-							//instantiated Adding and association adding
-							for(String s : vv.instantiated){
-								if(existsInList(s, classList)){
-									cp.addToInstantiated(s);
-								}
-								else if(s.contains("<")&&s.contains(">")){
-									int start = s.indexOf('<');
-									int end = s.indexOf('>');
-									String collection = s.substring(0, start);
-									String type = s.substring(start+1, end);
-									if(existsInList(type, classList)){
-										cp.addToAssociatedWith(type);
-									}
-									else if(existsInList(collection, classList)){
-										cp.addToAssociatedWith(collection);
-
-									}
-								}
-							};
-
-							//more associations
-							MethodVisitor mv = new MethodVisitor();
-							mv.visit(cu, null);
-							for(String s : mv.methods){
-								if(existsInList(s, classList)){
-									cp.addToAssociatedWith(s);
-								}
-								else if(s.contains("<")&&s.contains(">")){
-									int start = s.indexOf('<');
-									int end = s.indexOf('>');
-									String collection = s.substring(0, start);
-									String type = s.substring(start+1, end);
-									if(existsInList(type, classList)){
-										cp.addToAssociatedWith(type);
-									}
-									else if(existsInList(collection, classList)){
-										cp.addToAssociatedWith(collection);
-
-									}
-								}
-							};
-							//static access
-							for(TypeDeclaration type : cu.getTypes()){
-								List<BodyDeclaration> bodyList = type.getMembers();
-								for(BodyDeclaration bd : bodyList){
-									for(String cName : classList){
-										if(bd.toString().matches("(?s).*\\bAccount.\\b.*")){
-											//										System.out.println("Static Access:"+cName);
-											cp.addToStaticAccess(cName);
-										}
-									}
-								}
-							}
-							
-							
-							parsedList.add(cp);
-
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-
-					}
-				}
-			}
-		}
-
+		parseFolder(src);
 		return parsedList;
 
 	}
 
 
+	private void scanFolder(File file){
+		if(!file.isDirectory()&&file.getName().endsWith(".java")){
+			String className = file.getName().split("\\.")[0];
+			if(!classList.contains(className))classList.add(className);
+			return;
+		}
+		else if(file.isDirectory()){
+			for(File folder : file.listFiles()){
+				scanFolder(folder);
+			}
+		}
+	}
+	private void parseFolder(File file){
+		if(!file.isDirectory()&&file.getName().endsWith(".java")){
+			parseJavaFile(file);
+			return;
+		}
+		else if(file.isDirectory()){
+			for(File folder : file.listFiles()){
+				parseFolder(folder);
+			}
+		}
+	}
+	
+	private void parseJavaFile(File javaClassFile) {
+		try {
+			CompilationUnit cu = JavaParser.parse(javaClassFile);
+			ClassPacket cp = 
+					new ClassPacket(javaClassFile.getName().split("\\.")[0], 
+							cu.getPackage().getName().toString(), 
+							cu.getEndLine());
+			
+			//i think this is no longer necessary
+//			//Import adding
+//			List<ImportDeclaration> imports = cu.getImports();
+//			for(ImportDeclaration i : imports){
+//				if(existsInList(i.getName().getName(),classList)){
+//					cp.addToDependency(i.getName().getName());
+//				}
+//			}
+			//run visitor
+			VariableVisitor vv = new VariableVisitor();
+			List<TypeDeclaration> f_vars = cu.getTypes();
+			for (TypeDeclaration type : f_vars)
+			{
+				List<BodyDeclaration> members = type.getMembers();
+				for (BodyDeclaration member : members)
+				{
+					if (member instanceof FieldDeclaration)
+					{
+						FieldDeclaration myType = (FieldDeclaration) member;
+						if(existsInList(myType.getType().toString(),classList)){
+							vv.instantiated.add(myType.getType().toString());
+						}
+					}
+				}
+			}
+			vv.visit(cu, null);
+			
+			//instantiated Adding and association adding
+			for(String s : vv.instantiated){
+				if(existsInList(s, classList)){
+					cp.addToInstantiated(s);
+				}
+				else if(s.contains("<")&&s.contains(">")){
+					int start = s.indexOf('<');
+					int end = s.indexOf('>');
+					String collection = s.substring(0, start);
+					String type = s.substring(start+1, end);
+					if(existsInList(type, classList)){
+						cp.addToAssociatedWith(type);
+					}
+					else if(existsInList(collection, classList)){
+						cp.addToAssociatedWith(collection);
+
+					}
+				}
+			};
+			for(String s : vv.assignment){
+				if(existsInList(s, classList)){
+					cp.addToAssigned(s);
+				}
+				else if(s.contains("<")&&s.contains(">")){
+					int start = s.indexOf('<');
+					int end = s.indexOf('>');
+					String collection = s.substring(0, start);
+					String type = s.substring(start+1, end);
+					if(existsInList(type, classList)){
+						cp.addToAssociatedWith(type);
+					}
+					else if(existsInList(collection, classList)){
+						cp.addToAssociatedWith(collection);
+
+					}
+				}
+			};
+			//more associations
+			MethodVisitor mv = new MethodVisitor();
+			mv.visit(cu, null);
+			for(String s : mv.methodsParams){
+				if(existsInList(s, classList)){
+					cp.addToAssociatedWith(s);
+				}
+				else if(s.contains("<")&&s.contains(">")){
+					int start = s.indexOf('<');
+					int end = s.indexOf('>');
+					String collection = s.substring(0, start);
+					String type = s.substring(start+1, end);
+					if(existsInList(type, classList)){
+						cp.addToAssociatedWith(type);
+					}
+					else if(existsInList(collection, classList)){
+						cp.addToAssociatedWith(collection);
+
+					}
+				}
+			};
+			//static access
+			for(TypeDeclaration type : cu.getTypes()){
+				List<BodyDeclaration> bodyList = type.getMembers();
+				for(BodyDeclaration bd : bodyList){
+					for(String cName : classList){
+						if(bd.toString().matches("(?s).*\\b"+cName+"\\.[[a-zA-Z0-9]*].*")){
+							if(bd.toString().matches("(?s).*\\b"+cName+"\\.class.*")){
+								cp.addToAssociatedWith(cName);
+							}
+							
+							//										System.out.println("Static Access:"+cName);
+							else
+								cp.addToStaticAccess(cName);
+						}
+					}
+				}
+			}
+			
+			
+			parsedList.add(cp);
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private class VariableVisitor extends VoidVisitorAdapter{
 		ArrayList<String> instantiated = new ArrayList<String>();
+		ArrayList<String> assignment = new ArrayList<String>();
 		@Override
 		public void visit(VariableDeclarationExpr n, Object arg)
 		{      
-
-			instantiated.add(n.getType().toString());
+//			if(n.toString().matches("(?s).*\\bnew\\b"+n.getType().toString()+"[^A-Za-z0-9]].*")||
+//					n.toString().matches("(?s).*\\.new\\b.*")){
+//				instantiated.add(n.getType().toString());
+//			}
+//			else 
+				instantiated.add(n.getType().toString());
 		}
 	}
 	
 	 public class MethodVisitor extends VoidVisitorAdapter {
+		 ArrayList<String> methodsParams = new ArrayList<String>();
 		 ArrayList<String> methods = new ArrayList<String>();
+
 	        public void visit(MethodDeclaration n, Object arg)
 	        {
 	        	List<Parameter> params = n.getParameters();
 	        	if(params!=null){
 	        		for(Parameter p : params){
-	        			methods.add(p.getType().toString());
+	        			methodsParams.add(p.getType().toString());
 	        		}
 	        	}
 	        }

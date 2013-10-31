@@ -40,6 +40,7 @@ public class Analyser {
 		classDependency.packageName = cp.packageName;
 		
 		findCompositionDependency(cp, classDependency);
+//		findAggregationDependency(cp, classDependency);
 		findRealizationDependency(cp, classDependency);
 		findDirectionalAssocation(cp, classDependency);
 		
@@ -105,7 +106,24 @@ public class Analyser {
 			}
 			classDependency.associations.add(association);
 		}
+//		Association association;
+//		for(String dependentClass : packet.instantiated){
+//			association = classDependency.new Association();
+//			association.associatedWith = dependentClass;
+//			association.associationType = ClassDependency.COMPOSITION;
+//			classDependency.associations.add(association);
+//		}
 	}
+	
+//	public static void findAggregationDependency(ClassPacket packet, ClassDependency classDependency){
+//		Association association;
+//		for(String dependentClass : packet.assigned){
+//			association = classDependency.new Association();
+//			association.associatedWith = dependentClass;
+//			association.associationType = ClassDependency.AGGREGATION;
+//			classDependency.associations.add(association);
+//		}
+//	}
 
 	/**
 	 *  Sorts the instantiated classes for quicker searching
@@ -126,7 +144,7 @@ public class Analyser {
 		ClassPacket packetHolder;
 		for(ClassPacket packet: allClassPackets){
 			packetHolder = packet;
-			if(packetHolder.className != name || packetHolder.instantiated.size() != 0){
+			if(!packetHolder.className.equals(name) || packetHolder.instantiated.size() != 0){
 				if(packetHolder.instantiated.contains(name)){
 					listOfClasses.add(packetHolder.className);
 				}
