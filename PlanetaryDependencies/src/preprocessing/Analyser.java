@@ -83,7 +83,7 @@ public class Analyser {
 		}		
 	}
 
-	/** This is the primary method to find the composition dependencies, and it uses the other methods as helpers
+	/** This is the primary method to find the composition/aggregation dependencies
 	 * @param packet
 	 * @return ClassDependencies for the packet
 	 */

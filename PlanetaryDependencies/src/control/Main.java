@@ -23,7 +23,7 @@ public class Main extends Application {
 	//For JavaFX, this is the main calling method. Don't worry about stages for now, it will be used in UI later on. 
 	@Override
 	public void start(Stage stage) throws Exception {
-		String uri = System.getProperty("user.dir");
+		String uri = "C://Users//Cherry//git//orz//Leviathan//src//stuffplotter";
 		//store output of parser into arrayList
 		ArrayList<ClassPacket> parserOutput;
 		parserOutput = parser.parse(new File(uri));			//parser takes in a file as input, returns a list of ClassPackets
