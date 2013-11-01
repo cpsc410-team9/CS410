@@ -26,6 +26,5 @@ public class ClassDependency {
 	public class Association{
 		public String associatedWith;
 		public int associationType;
-		public int associationDirection;
 	}
 }
