@@ -24,7 +24,6 @@ public class Main extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		String uri = "C://Users//Shawn//git//orz//Leviathan";
-		System.out.println(Test.class);
 
 //		String uri = System.getProperty("user.dir");
 //		store output of parser into arrayList
