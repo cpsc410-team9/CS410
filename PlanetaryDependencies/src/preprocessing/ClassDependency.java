@@ -23,10 +23,6 @@ public class ClassDependency {
 
 	//to be used in the future
 	
-	int orbitalRadius;
-	int Color;
-	boolean orbitsClockwise;
-	
 	public class Association{
 		public String associatedWith;
 		public int associationType;
