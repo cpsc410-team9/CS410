@@ -63,7 +63,8 @@ public class Parser {
 	private void scanFolder(File file){
 		if(!file.isDirectory()&&file.getName().endsWith(".java")){
 			String className = file.getName().split("\\.")[0];
-			if(!classList.contains(className))classList.add(className);
+			if(!classList.contains(className))
+                classList.add(className);
 			return;
 		}
 		else if(file.isDirectory()){
@@ -72,6 +73,7 @@ public class Parser {
 			}
 		}
 	}
+
 	private void parseFolder(File file){
 		if(!file.isDirectory()&&file.getName().endsWith(".java")){
 			parseJavaFile(file);
@@ -187,7 +189,7 @@ public class Parser {
 								cp.addToAssociatedWith(cName);
 							}
 							
-							//										System.out.println("Static Access:"+cName);
+							//System.out.println("Static Access:"+cName);
 							else
 								cp.addToStaticAccess(cName);
 						}
@@ -199,10 +201,8 @@ public class Parser {
 			parsedList.add(cp);
 
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -229,7 +229,7 @@ public class Parser {
 	        public void visit(MethodDeclaration n, Object arg)
 	        {
 	        	List<Parameter> params = n.getParameters();
-	        	if(params!=null){
+	        	if(params != null){
 	        		for(Parameter p : params){
 	        			methodsParams.add(p.getType().toString());
 	        		}
@@ -239,7 +239,8 @@ public class Parser {
 	 
 	private static boolean existsInList(String name, ArrayList<String> classList) {
 		for(String s : classList){
-			if(name.equals(s))return true;
+			if(name.equals(s))
+                return true;
 		}
 		return false;
 	}
