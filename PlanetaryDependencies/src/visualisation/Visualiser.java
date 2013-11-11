@@ -1,17 +1,25 @@
 package visualisation;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Paint;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JFrame;
+
+import org.apache.commons.collections15.Transformer;
 
 import control.Main;
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;
@@ -27,7 +35,6 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
 import edu.uci.ics.jung.visualization.picking.PickedState;
-
 import preprocessing.ClassDependency;
 import preprocessing.ClassDependency.Association;
 import preprocessing.ClassPacket;
@@ -62,6 +69,41 @@ public class Visualiser {
 
 	}
 
+	public static void shapeVertices(VisualizationViewer vv){
+		 Transformer<String,Paint> vertexPaint = new Transformer<String,Paint>() {
+			 public Paint transform(String i) {
+			 return Color.GREEN;
+			 }
+			 };
+			 
+			 //Stroke to add colour and dashes
+			 float dash[] = {10.0f};
+			 final Stroke edgeStroke =  new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
+			 BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f);
+			 Transformer<String, Stroke> edgeStrokeTransformer =
+			 new Transformer<String, Stroke>() {
+			 public Stroke transform(String s) {
+			 return  edgeStroke;
+			 }
+			 };
+			 
+		        Transformer<String,Shape> vertexSize = new Transformer<String,Shape>(){
+		            public Shape transform(String i){
+		                Ellipse2D circle = new Ellipse2D.Double(-15, -15, 30, 30);
+		                // in this case, the vertex is twice as large
+		                if(i=="Account") return AffineTransform.getScaleInstance(2, 2).createTransformedShape(circle);
+		                else return circle;
+		            }
+		        };
+		        
+		        vv.getRenderContext().setVertexShapeTransformer(vertexSize);
+		        
+				 vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
+				 vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer); 
+
+
+	}
+	
 	
 	private static void setupCanvas(final ArrayList<ClassDependency> analyserOutput) {
 		starMapLayout.setSize(new Dimension(1024,768)); 
@@ -71,7 +113,7 @@ public class Visualiser {
 		solarSystemView.setPreferredSize(new Dimension(1024,768)); 
 
 		addHandlers(analyserOutput);
-		
+		shapeVertices(starView);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(starView);
 		frame.pack();
