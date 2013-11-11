@@ -31,12 +31,16 @@ import preprocessing.ClassDependency.Association;
 import preprocessing.ClassPacket;
 
 public class Visualiser {
+	static JFrame frame = new JFrame("Visualiser");
+	
 	public static ClassPacket test;
 	public static Graph<String, String> starMap;
-	public static Graph<String, String> solarSystem;
-	static VisualizationViewer<String,String> vv;
+	public static Graph<ClassDependency, String> solarSystem;
+	static VisualizationViewer<String, String> starView;
+	static VisualizationViewer<ClassDependency, String> solarSystemView;
+
 	static Layout<String, String> starMapLayout;
-	static Layout<String, String> solarSystemLayout;
+	static Layout<ClassDependency, String> solarSystemLayout;
 
 	
 	public static void process(ArrayList<ClassDependency> analyserOutput) {
@@ -45,10 +49,10 @@ public class Visualiser {
 		System.out.println();
 		System.out.println("Visualiser started.");
 		starMap = new SparseMultigraph<String, String>();
-		solarSystem = new SparseMultigraph<String, String>();
+		solarSystem = new SparseMultigraph<ClassDependency, String>();
 
 		starMapLayout = new ISOMLayout<String, String>(starMap);
-		solarSystemLayout = new SpringLayout<String, String>(solarSystem);
+		solarSystemLayout = new SpringLayout<ClassDependency, String>(solarSystem);
 		displayPackageGraph(analyserOutput);
 		
 		displayTextOutput(analyserOutput);
@@ -59,13 +63,27 @@ public class Visualiser {
 	
 	private static void setupCanvas(final ArrayList<ClassDependency> analyserOutput) {
 		starMapLayout.setSize(new Dimension(1024,768)); 
-		vv = new VisualizationViewer<String,String>(starMapLayout);
-		vv.setPreferredSize(new Dimension(1024,768)); 
+		starView = new VisualizationViewer<String,String>(starMapLayout);
+		starView.setPreferredSize(new Dimension(1024,768)); 
+		solarSystemView = new VisualizationViewer<ClassDependency,String>(solarSystemLayout);
+		solarSystemView.setPreferredSize(new Dimension(1024,768)); 
+
+		addHandlers(analyserOutput);
+		
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().add(starView);
+		frame.pack();
+		frame.setVisible(true);   		
+	}
+
+	private static void addHandlers(final ArrayList<ClassDependency> analyserOutput) {
 		DefaultModalGraphMouse<String, String> mouse = new DefaultModalGraphMouse<String, String>();
 		mouse.setMode(Mode.PICKING);
-        vv.setGraphMouse(mouse);
-		final PickedState<String> pickedState = vv.getPickedVertexState();
-		// Attach the listener that will print when the vertices selection changes.
+		starView.setGraphMouse(mouse);
+		solarSystemView.setGraphMouse(mouse);
+		final PickedState<String> pickedState = starView.getPickedVertexState();
+		final PickedState<ClassDependency> pickedState2 = solarSystemView.getPickedVertexState();
+		
 		pickedState.addItemListener(new ItemListener() {
 		 
 		    @Override
@@ -73,7 +91,7 @@ public class Visualiser {
 		    Object subject = e.getItem();
 		        // The graph uses Integers for vertices.
 		        if (subject instanceof String) {
-		            String vertex = (String) subject;
+		        	String vertex = (String) subject;
 		            
 		            if (pickedState.isPicked(vertex)) {
 		                System.out.println("Vertex " + vertex
@@ -82,38 +100,68 @@ public class Visualiser {
 		            } else {
 		                System.out.println("Vertex " + vertex
 		                    + " no longer selected");
-		        		vv.setGraphLayout(starMapLayout);		
 
 		            }
 		        }
 		    }
-		});
-		JFrame frame = new JFrame("Graph Test");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(vv);
-		frame.pack();
-		frame.setVisible(true);   		
+		});		
+		pickedState2.addItemListener(new ItemListener() {
+			 
+		    @Override
+		    public void itemStateChanged(ItemEvent e) {
+		    Object subject = e.getItem();
+		        // The graph uses Integers for vertices.
+		        if (subject instanceof ClassDependency) {
+		        	ClassDependency vertex = (ClassDependency) subject;
+		            
+		            if (pickedState2.isPicked(vertex)) {
+		                System.out.println("Vertex " + vertex.className+" in "+vertex.packageName
+			                    + " selected");
+		            } else {
+		                System.out.println("Vertex " + vertex
+		                    + " no longer selected");
+		        		frame.getContentPane().remove(solarSystemView);
+		        		frame.getContentPane().add(starView);
+
+		            }
+		        }
+		    }
+		});		
 	}
 
+
 	protected static void graphSelectedClassSolarSystem(String vertex, ArrayList<ClassDependency> list) {
-		solarSystem = new SparseMultigraph<String, String>();
+		solarSystem = new SparseMultigraph<ClassDependency, String>();
 
 		for(ClassDependency cd : list){
 			if(cd.packageName.equals(vertex)){
-				solarSystem.addVertex(cd.packageName);
+				solarSystem.addVertex(cd);
 			}
 		}
 		for(ClassDependency cd : list){
 			if(cd.packageName.equals(vertex)){
 				for(Association a : cd.associations){
-					solarSystem.addVertex(a.associatedWith);
-					solarSystem.addEdge(cd.packageName+"-"+a.associatedWith, cd.packageName,a.associatedWith);
+					ClassDependency temp = findClassDependency(a.associatedWith, list);
+					solarSystem.addVertex(temp);
+					solarSystem.addEdge(cd.className+"-"+a.associatedWith, cd, temp);
 				}
 			}
 		}
 		solarSystemLayout.setGraph(solarSystem);
-		vv.setGraphLayout(solarSystemLayout);		
+		solarSystemView.setGraphLayout(solarSystemLayout);		
+		frame.getContentPane().remove(starView);
+		frame.getContentPane().add(solarSystemView);
+		
 
+	}
+
+
+	private static ClassDependency findClassDependency(String associatedWith,ArrayList<ClassDependency> list) {
+
+		for(ClassDependency cd : list){
+			if(cd.className.equals(associatedWith))return cd;
+		}
+		return null;
 	}
 
 
