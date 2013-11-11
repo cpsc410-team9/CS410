@@ -42,7 +42,6 @@ public class JungTest {
     	System.out.println("The graph g2 = " + g2.toString()); 
     }
     
-
 	public static void main(String[] args) {
 		 JungTest sgv = new JungTest();
 		Layout<Integer, String> layout = new CircleLayout(sgv.g);
