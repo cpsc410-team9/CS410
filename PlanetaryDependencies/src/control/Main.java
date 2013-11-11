@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 	Parser parser = new Parser();
-
+	
 	//Do not use this method
 	public static void main(String[] args) {
 		launch(args);

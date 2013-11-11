@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
@@ -94,12 +96,10 @@ public class Visualiser {
 		        	String vertex = (String) subject;
 		            
 		            if (pickedState.isPicked(vertex)) {
-		                System.out.println("Vertex " + vertex
-			                    + " selected");
+		                System.out.println("Solar System: " + vertex);
 		            	graphSelectedClassSolarSystem(vertex, analyserOutput);
 		            } else {
-		                System.out.println("Vertex " + vertex
-		                    + " no longer selected");
+
 
 		            }
 		        }
@@ -115,18 +115,49 @@ public class Visualiser {
 		        	ClassDependency vertex = (ClassDependency) subject;
 		            
 		            if (pickedState2.isPicked(vertex)) {
-		                System.out.println("Vertex " + vertex.className+" in "+vertex.packageName
-			                    + " selected");
+		                System.out.println("Planet: " + vertex.className+"\nSolar System: "+vertex.packageName);
 		            } else {
-		                System.out.println("Vertex " + vertex
-		                    + " no longer selected");
-		        		frame.getContentPane().remove(solarSystemView);
-		        		frame.getContentPane().add(starView);
-
 		            }
 		        }
+
 		    }
-		});		
+		});	
+		solarSystemView.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getButton()==3){
+					frame.getContentPane().add(starView);
+					frame.remove(solarSystemView);
+					frame.pack();
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 	}
 
 
@@ -149,10 +180,9 @@ public class Visualiser {
 		}
 		solarSystemLayout.setGraph(solarSystem);
 		solarSystemView.setGraphLayout(solarSystemLayout);		
-		frame.getContentPane().remove(starView);
+		frame.getContentPane().removeAll();
 		frame.getContentPane().add(solarSystemView);
-		
-
+		frame.pack();
 	}
 
 
