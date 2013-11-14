@@ -35,7 +35,7 @@ public class Analyser {
 
 	private static ClassDependency generateClassDependencyObject(
 			ClassPacket cp) {
-		ClassDependency classDependency = new ClassDependency(cp.className);
+		ClassDependency classDependency = new ClassDependency(cp.className, cp.lineCount);
 		classDependency.planetaryRadius = cp.lineCount;
 		classDependency.packageName = cp.packageName;
 		

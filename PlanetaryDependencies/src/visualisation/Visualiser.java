@@ -35,6 +35,8 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
 import edu.uci.ics.jung.visualization.picking.PickedState;
+import edu.uci.ics.jung.visualization.renderers.Renderer.Edge;
+import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import preprocessing.ClassDependency;
 import preprocessing.ClassDependency.Association;
 import preprocessing.ClassPacket;
@@ -69,39 +71,62 @@ public class Visualiser {
 
 	}
 
-	public static void shapeVertices(VisualizationViewer vv){
-		 Transformer<String,Paint> vertexPaint = new Transformer<String,Paint>() {
-			 public Paint transform(String i) {
-			 return Color.GREEN;
+	public static void shapePlanetVertices(VisualizationViewer<ClassDependency, String> vv){
+		 Transformer<ClassDependency,Paint> vertexPaint = new Transformer<ClassDependency,Paint>() {
+			 public Paint transform(ClassDependency c) {
+				 //vertex will flash different colours if use the code below
+			 //return new Color((float) Math.random(),(float) Math.random(),(float) Math.random());
+			 return c.colour;
 			 }
 			 };
-			 
-			 //Stroke to add colour and dashes
-			 float dash[] = {10.0f};
-			 final Stroke edgeStroke =  new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
-			 BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f);
-			 Transformer<String, Stroke> edgeStrokeTransformer =
-			 new Transformer<String, Stroke>() {
-			 public Stroke transform(String s) {
-			 return  edgeStroke;
-			 }
-			 };
-			 
-		        Transformer<String,Shape> vertexSize = new Transformer<String,Shape>(){
-		            public Shape transform(String i){
-		                Ellipse2D circle = new Ellipse2D.Double(-15, -15, 30, 30);
-		                // in this case, the vertex is twice as large
-		                if(i=="Account") return AffineTransform.getScaleInstance(2, 2).createTransformedShape(circle);
-		                else return circle;
-		            }
+		        Transformer<ClassDependency,Shape> vertexSize = new Transformer<ClassDependency,Shape>(){ 
+		            public Shape transform(ClassDependency i){
+		                Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
+		                int radius = (i.lineCount)/5;
+		                 return AffineTransform.getScaleInstance(radius,radius).createTransformedShape(circle);
+		                 }
 		        };
 		        
-		        vv.getRenderContext().setVertexShapeTransformer(vertexSize);
+		        Transformer<ClassDependency, String> label = new Transformer<ClassDependency,String>(){
+		        	public String transform(ClassDependency i){
+		        		return i.className;
+		        	}
+		        };
 		        
-				 vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
-				 vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer); 
-
-
+		        vv.getRenderContext().setVertexLabelTransformer(label);
+		        vv.getRenderContext().setVertexShapeTransformer(vertexSize);
+		        vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);    
+				vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
+				vv.setBackground(Color.BLACK);
+	}
+	
+	public static void shapeStarVertices(VisualizationViewer<String,String> vv){
+		 Transformer<String,Paint> vertexPaint = new Transformer<String,Paint>() {
+			 public Paint transform(String s) {
+			 return new Color(255, 255, 0);
+			 //return ;
+			 }
+			 };
+			 
+		        Transformer<String,Shape> vertexSize = new Transformer<String,Shape>(){ 
+		            public Shape transform(String i){
+		                Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
+		                int radius = 10;
+		                 return AffineTransform.getScaleInstance(radius,radius).createTransformedShape(circle);
+		                 }
+		        };
+		        
+		        Transformer<String, String> label = new Transformer<String,String>(){
+		        	public String transform(String i){
+		        		return i;
+		        	}
+		        };
+		        
+		        vv.getRenderContext().setVertexLabelTransformer(label);
+		        vv.getRenderContext().setVertexShapeTransformer(vertexSize);
+		        vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);    
+				vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
+				vv.setBackground(Color.BLACK);
 	}
 	
 	
@@ -113,7 +138,9 @@ public class Visualiser {
 		solarSystemView.setPreferredSize(new Dimension(1024,768)); 
 
 		addHandlers(analyserOutput);
-		shapeVertices(starView);
+		shapePlanetVertices(solarSystemView);
+		shapeStarVertices(starView);
+		frame.getContentPane().setBackground(Color.BLACK);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(starView);
 		frame.pack();
@@ -261,6 +288,7 @@ public class Visualiser {
 		return null;
 	}
 
+	// not used
 	private static void drawClassGraph(ArrayList<ClassDependency> list){
 
     	//populate vertices

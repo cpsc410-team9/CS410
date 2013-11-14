@@ -30,7 +30,7 @@ public class Main extends Application {
 			uri = "C://Users//Shawn//git//orz//Leviathan";
 		if(!new File(uri).exists())
 			//check cherry
-			uri = "cherry's leviathan directory";;
+			uri = "C://Users//Cherry//git//orz//Leviathan";;
 		if(!new File(uri).exists())
 			//default
 			uri = System.getProperty("user.dir");
