@@ -98,6 +98,7 @@ public class Visualiser {
 		        vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);    
 				vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 				vv.setBackground(Color.BLACK);
+				vv.setForeground(Color.WHITE);
 	}
 	
 	public static void shapeStarVertices(VisualizationViewer<String,String> vv){
@@ -127,6 +128,7 @@ public class Visualiser {
 		        vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);    
 				vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 				vv.setBackground(Color.BLACK);
+				vv.setForeground(Color.WHITE);
 	}
 	
 	
@@ -262,7 +264,6 @@ public class Visualiser {
 		}
 		return null;
 	}
-
 
 	private static void displayPackageGraph(
 			ArrayList<ClassDependency> analyserOutput) {
