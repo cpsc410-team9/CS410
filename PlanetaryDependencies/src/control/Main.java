@@ -16,47 +16,41 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 	Parser parser = new Parser();
-	
-	//Do not use this method
+
 	public static void main(String[] args) {
 		launch(args);
 	}
 
-	public String determineURI(){
-		//check for Robert
-		String uri = "C:\\Users\\Robert Yuen\\Desktop\\TargetCode\\trunk\\Leviathan";
-		if(!new File(uri).exists())
-			//check for Shawn
-			uri = "C://Users//Shawn//git//orz//Leviathan";
-		if(!new File(uri).exists())
-			//check cherry
-			uri = "C://Users//Cherry//git//orz//Leviathan";;
-		if(!new File(uri).exists())
-			//default
-			uri = System.getProperty("user.dir");
-		return uri;
-	}
-	//For JavaFX, this is the main calling method. Don't worry about stages for now, it will be used in UI later on. 
+
+	//JavaFX Start Method
 	@Override
 	public void start(Stage stage) throws Exception {
-        //Add the File Path to Leviathan Here.
-        //Task for next submit.
 
+        File targetCodeDir = new File(GetTargetCodePath());
+
+		ArrayList<ClassPacket> parserOutput = parser.parse(targetCodeDir);
+
+		ArrayList<ClassDependency> analyserOutput = Analyser.analyse(parserOutput);
+
+		Visualiser.process(analyserOutput);
 		
-		String uri = determineURI();
-        //		store output of parser into arrayList
-		ArrayList<ClassPacket> parserOutput;
-		parserOutput = parser.parse(new File(uri));			//parser takes in a file as input, returns a list of ClassPackets
-		
-		//use arrayList in analyser
-		ArrayList<ClassDependency> analyserOutput;
-		analyserOutput = Analyser.analyse(parserOutput);	//Analyser takes in a list of ClassPackets as input,
-															//returns a list of ClassDependencies
-		
-		Visualiser.process(analyserOutput);					//Takes in a list of ClassDependencies, returns nothing.
-		
-		//Basic way to shutdown the application. To be worked on.
-//		System.exit(0);
+		//Shuts down application. Needs Work.
+        //System.exit(0);
 	}
+
+    //Helper, Gets Directory of Code to be Analyzed.
+    private String GetTargetCodePath(){
+//        String currentDir = System.getProperty("user.dir");
+//        String targetRelativePath = "\\Target\\Leviathan";
+//        return currentDir + targetRelativePath;
+
+          File currDir = new File(System.getProperty("user.dir"));
+          File parentFile = currDir.getParentFile();
+          String targetRelativePath = "\\Target\\Leviathan";
+          return parentFile.getAbsolutePath() + targetRelativePath;
+    }
+
+
+
 
 }

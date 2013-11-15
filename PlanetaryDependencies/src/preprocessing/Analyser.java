@@ -8,30 +8,7 @@ import preprocessing.ClassDependency.Association;
 
 public class Analyser {
 
-	/**
-	 * @param args
-	 */
 	public static ArrayList<ClassPacket> allClassPackets = new ArrayList<ClassPacket>();
-
-
-//	/** 
-//	 *  Ready made ClassPackets for testing
-//	 */
-//	public static void makeTestPackets(){
-//		ClassPacket packet1 = new ClassPacket("Pop", "DrinksPackage", 100);
-//		Collections.addAll(packet1.instantiated,"Table","Chair","Apple","Moose","Squid","MapleTree","Saturn","RocketChair");
-//		allClassPackets.add(packet1);	
-//		ClassPacket packet2 = new ClassPacket("Apple", "FruitsPackage", 200);
-//		Collections.addAll(packet2.instantiated,"Moose","Pop","Orange","KoolAid","Tiger","AlexFraser","MoonHouse","RocketChair");
-//		allClassPackets.add(packet2);
-//		ClassPacket packet3 = new ClassPacket("Tiger", "AnimalsPackage", 1000);
-//		Collections.addAll(packet3.instantiated,"Ranger","Pop","Apple","Car","Poop","Tree","Pluto","FaceTurtle");
-//		allClassPackets.add(packet3);
-//		ClassPacket packet4 = new ClassPacket("Hat", "ClothingPackage", 20);
-//		Collections.addAll(packet4.instantiated,"Mango","Tiger","Watermelon","Moose","Apple","Maple","Yoghurt");
-//		allClassPackets.add(packet4);
-//
-//	}
 
 	private static ClassDependency generateClassDependencyObject(
 			ClassPacket cp) {
@@ -46,11 +23,8 @@ public class Analyser {
 		
 		return classDependency;
 	}
-	
-	/**
-	 * @param packet
-	 * @param classDependency
-	 */
+
+
 	private static void findDirectionalAssocation(ClassPacket packet,
 			ClassDependency classDependency) {
 		Association association;
@@ -152,9 +126,7 @@ public class Analyser {
 		}
 		return listOfClasses;
 	}
-	//	public static void main(String[] args) {
-	//		// TODO Auto-generated method stub
-	//	}
+
 
 	public static ArrayList<ClassDependency> analyse(ArrayList<ClassPacket> parserOutput) {
 		// TODO complete analysis tool. Feel free to use helper methods, submethods, custom classes, etc. 

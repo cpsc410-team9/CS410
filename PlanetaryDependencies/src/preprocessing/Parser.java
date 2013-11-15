@@ -29,16 +29,13 @@ import control.Main;
 
 public class Parser {
 	ArrayList<ClassPacket> parsedList = new ArrayList<ClassPacket>();
-//	ArrayList<String> packageList = new ArrayList<String>();
 	ArrayList<String> classList = new ArrayList<String>();
 	
 	public ArrayList<ClassPacket> parse(File file) throws FileNotFoundException{
 		System.out.println("Parser started.");
 
 
-		/*
-		 * Complete parsing method here
-		 */
+		// Complete parsing method here
 		//from project, find the src folder containing packages
 		System.out.println("Folder selected: "+file.getAbsolutePath());
 
@@ -61,6 +58,7 @@ public class Parser {
 
 
 	private void scanFolder(File file){
+        //System.out.println("scan folder");
 		if(!file.isDirectory()&&file.getName().endsWith(".java")){
 			String className = file.getName().split("\\.")[0];
 			if(!classList.contains(className))
