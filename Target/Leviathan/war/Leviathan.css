@@ -1,0 +1,182 @@
+/** Add css rules here for your application. */
+
+.error-text {
+	color: #FF0000;
+}
+
+.conflicting-time {
+	color: #FF002B;
+}
+
+.banner {
+	background-image: url(./images/banner.jpg);
+	background-repeat: no-repeat;
+	background-position: center;
+	width: 100%;
+	height: 100px;
+}
+
+.loading {
+	background-image: url(./images/orz.gif);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center;
+}
+
+.masterContainer {
+	width: 100%;
+}
+
+.topBar {
+	float: right;
+	width: 100%;
+	font-size: 8pt;
+}
+
+.topBarNotifications {
+	float: left;
+}
+
+.topBarUserName {
+	float: right;
+}
+
+.topBarSeparator {
+	margin: 0px 10px;
+}
+
+.topBarLogOut {
+	float: right;
+}
+
+
+.menuBar {
+	margin: auto;
+	margin-top: 12px;
+	border: 8px solid #333;
+	background-color: #555;
+	width: 80%;
+}
+
+.menuBar td {
+	width: 20%;
+	padding: 8px 12px;
+}
+
+.menuBar .gwt-Button {
+	width: 100%;
+	-webkit-box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+ 	box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+  	-moz-box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+  	/*
+	-moz-border-radius: 8px;
+  	-webkit-border-radius: 8px;
+  	border-radius: 8px;
+  	*/
+}
+
+.mainDeck {
+	margin: 8px auto;
+	width: 80%;
+}
+
+.actionBar .gwt-Button {
+	width: 100%;
+	-webkit-box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+ 	box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+  	-moz-box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+}
+
+.commonActionBar {
+	width: 150px;
+}
+
+.eventActionBar {
+	width: 150px;
+}
+
+.redActionButton {
+	color: red;
+}
+
+.blueActionButton {
+	color: blue;
+}
+
+.greenActionButton {
+	color: green;
+}
+
+.eventRoll {
+	float: right;
+	width: 100%;
+	text-align: center;
+}
+
+.eventListing {
+	padding: 20px;
+	width: 200px;
+}
+
+.eventSelected {
+	background-color: #DDD;
+}
+
+.eventNameLabel {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.eventDateLabel {
+	font-size: 1.1em;
+	color: #333;
+}
+
+.eventListingLabel {
+	font-size: 1.1em;
+	font-weight: bold;
+	color: blue;
+}
+
+
+
+.eventInvitedLabel {
+	color: green;
+}
+
+.eventUnscheduledLabel {
+	color: red;
+}
+
+.eventScheduledLabel {
+	color: orange;
+}
+
+.eventContainer {
+	width: 100%;
+	border-left: 1px solid grey;
+	border-right: 1px solid grey;
+}
+
+.eventPage {
+	padding: 20px;
+}
+
+
+/** Most GWT widgets already have a style name defined */
+.gwt-DialogBox {
+  width: 400px;
+}
+
+.dialogVPanel {
+  margin: 5px;
+}
+
+.serverResponseLabelError {
+  color: red;
+}
+
+/** Set ids using widget.getElement().setId("idOfElement") */
+#closeButton {
+  margin: 15px 6px 6px;
+}
