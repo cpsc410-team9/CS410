@@ -99,6 +99,16 @@ public class Visualiser {
 				return i.className;
 			}
 		};
+		
+		//just wanted to see the edges since the background is black
+		//this can be deleted when the edges are implemented
+		Transformer<String, Paint> edgePaint = new Transformer<String, Paint>() {
+			public Paint transform(String s) {
+				return Color.WHITE;
+			}
+		};
+		//this can be deleted when the edges are implemented
+		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 
 		vv.getRenderContext().setVertexLabelTransformer(label);
 		vv.getRenderContext().setVertexShapeTransformer(vertexSize);
@@ -106,6 +116,7 @@ public class Visualiser {
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 		vv.setBackground(Color.BLACK);
 		vv.setForeground(Color.WHITE);
+
 	}
 
 	// Changes colour/size for star/package vertices
