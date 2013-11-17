@@ -3,6 +3,7 @@ package visualisation;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
@@ -17,12 +18,15 @@ import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javafx.stage.Screen;
+
 import javax.swing.JFrame;
 
 import org.apache.commons.collections15.Transformer;
 
 import control.Main;
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
 import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
@@ -44,26 +48,25 @@ import preprocessing.ClassPacket;
 public class Visualiser {
 	static JFrame frame = new JFrame("Visualiser");
 
-	public static ClassPacket test;
-	public static Graph<StarVertex, String> starMap;
-	public static Graph<ClassDependency, String> solarSystem;
-	static VisualizationViewer<StarVertex, String> starView;
-	static VisualizationViewer<ClassDependency, String> solarSystemView;
+	public ClassPacket test;
+	public Graph<StarVertex, String> starMap;
+	public Graph<ClassDependency, CustomEdge> solarSystem;
+	VisualizationViewer<StarVertex, String> starView;
+	VisualizationViewer<ClassDependency, CustomEdge> solarSystemView;
 
-	static Layout<StarVertex, String> starMapLayout;
-	static Layout<ClassDependency, String> solarSystemLayout;
-
-	public static void process(ArrayList<ClassDependency> analyserOutput) {
+	Layout<StarVertex, String> starMapLayout;
+	Layout<ClassDependency, CustomEdge> solarSystemLayout;
+	
+	public void process(ArrayList<ClassDependency> analyserOutput) {
 
 		// TODO perform full rendering ultimately, for now, use this to perform
 		// text output.
 		System.out.println();
 		System.out.println("Visualiser started.");
 		starMap = new SparseMultigraph<StarVertex, String>();
-		solarSystem = new SparseMultigraph<ClassDependency, String>();
-
+		solarSystem = new SparseMultigraph<ClassDependency, CustomEdge>();
 		starMapLayout = new ISOMLayout<StarVertex, String>(starMap);
-		solarSystemLayout = new SpringLayout<ClassDependency, String>(
+		solarSystemLayout = new FRLayout<ClassDependency, CustomEdge>(
 				solarSystem);
 		ArrayList<StarVertex> StarVertices = StarVertex
 				.classDependencyToStarVertex(analyserOutput);
@@ -74,9 +77,16 @@ public class Visualiser {
 
 	}
 
+
+	private class CustomEdge {
+		String from;
+		String to;
+		int type;
+	}
+	
 	// Changes colour/size for planet/class vertices
-	public static void shapePlanetVertices(
-			VisualizationViewer<ClassDependency, String> vv) {
+	public void shapePlanetVertices(
+			VisualizationViewer<ClassDependency, CustomEdge> solarSystemView2) {
 		Transformer<ClassDependency, Paint> vertexPaint = new Transformer<ClassDependency, Paint>() {
 			public Paint transform(ClassDependency c) {
 				// vertex will flash different colours if use the code below
@@ -88,7 +98,7 @@ public class Visualiser {
 		Transformer<ClassDependency, Shape> vertexSize = new Transformer<ClassDependency, Shape>() {
 			public Shape transform(ClassDependency i) {
 				Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
-				int radius = (i.lineCount) / 2;
+				int radius = (i.lineCount) / 10;
 				return AffineTransform.getScaleInstance(radius, radius)
 						.createTransformedShape(circle);
 			}
@@ -102,25 +112,37 @@ public class Visualiser {
 		
 		//just wanted to see the edges since the background is black
 		//this can be deleted when the edges are implemented
-		Transformer<String, Paint> edgePaint = new Transformer<String, Paint>() {
-			public Paint transform(String s) {
-				return Color.WHITE;
+		Transformer<CustomEdge, Paint> edgePaint = new Transformer<CustomEdge, Paint>() {
+			public Paint transform(CustomEdge ce) {
+				switch(ce.type){
+				case ClassDependency.COMPOSITION:
+					return Color.WHITE;
+				case ClassDependency.AGGREGATION:
+					return Color.PINK;
+				case ClassDependency.REALIZATION:
+					return Color.CYAN;
+				default:
+					return Color.GREEN;
+					
+				}
 			}
 		};
 		//this can be deleted when the edges are implemented
-		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
-
-		vv.getRenderContext().setVertexLabelTransformer(label);
-		vv.getRenderContext().setVertexShapeTransformer(vertexSize);
-		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
-		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
-		vv.setBackground(Color.BLACK);
-		vv.setForeground(Color.WHITE);
+		solarSystemView2.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
+		solarSystemView2.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
+		
+		solarSystemView2.getRenderContext().setVertexLabelTransformer(label);
+		
+		solarSystemView2.getRenderContext().setVertexShapeTransformer(vertexSize);
+		solarSystemView2.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
+		solarSystemView2.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
+		solarSystemView2.setBackground(Color.BLACK);
+		solarSystemView2.setForeground(Color.WHITE);
 
 	}
 
 	// Changes colour/size for star/package vertices
-	public static void shapeStarVertices(
+	public void shapeStarVertices(
 			VisualizationViewer<StarVertex, String> vv) {
 		Transformer<StarVertex, Paint> vertexPaint = new Transformer<StarVertex, Paint>() {
 			public Paint transform(StarVertex s) {
@@ -161,26 +183,28 @@ public class Visualiser {
 		vv.setForeground(Color.WHITE);
 	}
 
-	private static void setupCanvas(
+	private void setupCanvas(
 			final ArrayList<ClassDependency> analyserOutput) {
-		starMapLayout.setSize(new Dimension(1024, 768));
+		starMapLayout.setSize(new Dimension((int)Screen.getPrimary().getBounds().getWidth(), (int)Screen.getPrimary().getBounds().getHeight()));
 		starView = new VisualizationViewer<StarVertex, String>(starMapLayout);
-		starView.setPreferredSize(new Dimension(1024, 768));
-		solarSystemView = new VisualizationViewer<ClassDependency, String>(
+		solarSystemView = new VisualizationViewer<ClassDependency, CustomEdge>(
 				solarSystemLayout);
-		solarSystemView.setPreferredSize(new Dimension(1024, 768));
+		solarSystemLayout.setSize(new Dimension((int)Screen.getPrimary().getBounds().getWidth(), (int)Screen.getPrimary().getBounds().getHeight()));
+
+		solarSystemView.setSize(new Dimension((int)Screen.getPrimary().getBounds().getWidth(), (int)Screen.getPrimary().getBounds().getHeight()));
 
 		addHandlers(analyserOutput);
 		shapePlanetVertices(solarSystemView);
 		shapeStarVertices(starView);
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH);  
+
 		frame.getContentPane().setBackground(Color.BLACK);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(starView);
-		frame.pack();
 		frame.setVisible(true);
 	}
 
-	private static void addHandlers(
+	private void addHandlers(
 			final ArrayList<ClassDependency> analyserOutput) {
 		DefaultModalGraphMouse<String, String> mouse = new DefaultModalGraphMouse<String, String>();
 		mouse.setMode(Mode.PICKING);
@@ -234,7 +258,8 @@ public class Visualiser {
 				if (e.getButton() == 3) {
 					frame.getContentPane().add(starView);
 					frame.remove(solarSystemView);
-					frame.pack();
+					frame.revalidate();
+					frame.repaint();
 				}
 			}
 
@@ -262,9 +287,9 @@ public class Visualiser {
 		});
 	}
 
-	protected static void graphSelectedClassSolarSystem(StarVertex vertex,
+	protected void graphSelectedClassSolarSystem(StarVertex vertex,
 			ArrayList<ClassDependency> list) {
-		solarSystem = new SparseMultigraph<ClassDependency, String>();
+		solarSystem = new SparseMultigraph<ClassDependency, CustomEdge>();
 
 		for (ClassDependency cd : list) {
 			if (cd.packageName.equals(vertex.toString())) {
@@ -277,8 +302,19 @@ public class Visualiser {
 					ClassDependency temp = findClassDependency(
 							a.associatedWith, list);
 					solarSystem.addVertex(temp);
-					solarSystem.addEdge(cd.className + "-" + a.associatedWith,
-							cd, temp);
+					CustomEdge ce = new CustomEdge();
+					ce.from=cd.className;
+					ce.to=a.associatedWith;
+					ce.type=a.associationType;
+					if(ce.type==ClassDependency.UNIDIRECTIONAL_ASSOCIATION){
+						solarSystem.addEdge(ce,
+								cd, temp,EdgeType.DIRECTED);
+					}
+					else{
+						solarSystem.addEdge(ce,
+								cd, temp,EdgeType.UNDIRECTED);
+					}					
+					
 				}
 			}
 		}
@@ -286,10 +322,10 @@ public class Visualiser {
 		solarSystemView.setGraphLayout(solarSystemLayout);
 		frame.getContentPane().removeAll();
 		frame.getContentPane().add(solarSystemView);
-		frame.pack();
+		frame.revalidate();
 	}
 
-	private static ClassDependency findClassDependency(String associatedWith,
+	private ClassDependency findClassDependency(String associatedWith,
 			ArrayList<ClassDependency> list) {
 
 		for (ClassDependency cd : list) {
@@ -299,7 +335,7 @@ public class Visualiser {
 		return null;
 	}
 
-	private static void displayPackageGraph(ArrayList<StarVertex> starVertices) {
+	private void displayPackageGraph(ArrayList<StarVertex> starVertices) {
 		for (StarVertex sv : starVertices) {
 			starMap.addVertex(sv);
 		}
@@ -314,7 +350,7 @@ public class Visualiser {
 
 	}
 
-	private static StarVertex packageNameOf(String associatedWith,
+	private StarVertex packageNameOf(String associatedWith,
 			ArrayList<StarVertex> starVertices) {
 		for (StarVertex sv : starVertices) {
 			if (sv.starName.equals(associatedWith)) {

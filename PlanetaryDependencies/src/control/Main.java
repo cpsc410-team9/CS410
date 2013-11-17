@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 	Parser parser = new Parser();
-
+	Visualiser v = new Visualiser();
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -32,7 +32,7 @@ public class Main extends Application {
 
 		ArrayList<ClassDependency> analyserOutput = Analyser.analyse(parserOutput);
 
-		Visualiser.process(analyserOutput);
+		v.process(analyserOutput);
 		
 		//Shuts down application. Needs Work.
         //System.exit(0);

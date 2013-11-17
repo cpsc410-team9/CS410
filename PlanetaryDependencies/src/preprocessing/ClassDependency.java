@@ -5,12 +5,12 @@ import java.util.ArrayList;
 
 public class ClassDependency {
 	
-	public static int COMPOSITION = 0;
-	public static int AGGREGATION = 1;
-	public static int REALIZATION = 2;
-	public static int UNIDIRECTIONAL_ASSOCIATION = 3;
-	public static int BIDIRECTIONAL_ASSOCIATION = 4;
-	public static int lineCount =0;
+	public final static int COMPOSITION = 0;
+	public final static int AGGREGATION = 1;
+	public final static int REALIZATION = 2;
+	public final static int UNIDIRECTIONAL_ASSOCIATION = 3;
+	public final static int BIDIRECTIONAL_ASSOCIATION = 4;
+	public int lineCount =0;
 
 	public String className;
 	public String packageName;
