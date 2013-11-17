@@ -88,7 +88,7 @@ public class Visualiser {
 		Transformer<ClassDependency, Shape> vertexSize = new Transformer<ClassDependency, Shape>() {
 			public Shape transform(ClassDependency i) {
 				Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
-				int radius = (i.lineCount) / 5;
+				int radius = (i.lineCount) / 2;
 				return AffineTransform.getScaleInstance(radius, radius)
 						.createTransformedShape(circle);
 			}
@@ -120,7 +120,7 @@ public class Visualiser {
 		Transformer<StarVertex, Shape> vertexSize = new Transformer<StarVertex, Shape>() {
 			public Shape transform(StarVertex s) {
 				Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
-				int radius = s.starSize;
+				int radius = s.starSize*2;
 				return AffineTransform.getScaleInstance(radius, radius)
 						.createTransformedShape(circle);
 			}
