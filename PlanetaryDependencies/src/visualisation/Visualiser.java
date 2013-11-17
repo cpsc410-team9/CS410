@@ -98,9 +98,15 @@ public class Visualiser {
 		Transformer<ClassDependency, Shape> vertexSize = new Transformer<ClassDependency, Shape>() {
 			public Shape transform(ClassDependency i) {
 				Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
-				int radius = (i.lineCount) / 10;
-				return AffineTransform.getScaleInstance(radius, radius)
+				int r = i.lineCount / 10;
+				return AffineTransform.getScaleInstance(r, r)
 						.createTransformedShape(circle);
+			}
+		};
+		
+		Transformer<ClassDependency, Integer> labelOffset = new Transformer<ClassDependency, Integer>(){
+			public Integer transform(ClassDependency i){
+				return 5 + (i.lineCount/10);
 			}
 		};
 
@@ -132,9 +138,8 @@ public class Visualiser {
 		solarSystemView2.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
 		
 		solarSystemView2.getRenderContext().setVertexLabelTransformer(label);
-		
 		solarSystemView2.getRenderContext().setVertexShapeTransformer(vertexSize);
-		solarSystemView2.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
+		solarSystemView2.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 		solarSystemView2.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 		solarSystemView2.setBackground(Color.BLACK);
 		solarSystemView2.setForeground(Color.WHITE);
@@ -177,7 +182,7 @@ public class Visualiser {
 
 		vv.getRenderContext().setVertexLabelTransformer(label);
 		vv.getRenderContext().setVertexShapeTransformer(vertexSize);
-		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
+		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 		vv.setBackground(Color.BLACK);
 		vv.setForeground(Color.WHITE);
