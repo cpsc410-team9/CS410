@@ -2,6 +2,7 @@ package visualisation;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Paint;
@@ -46,8 +47,7 @@ import preprocessing.ClassDependency.Association;
 import preprocessing.ClassPacket;
 
 public class Visualiser {
-	static JFrame frame = new JFrame("Visualiser");
-
+	VFrame frame = new VFrame("Visualiser");
 	public ClassPacket test;
 	public Graph<StarVertex, String> starMap;
 	public Graph<ClassDependency, CustomEdge> solarSystem;
@@ -138,11 +138,12 @@ public class Visualiser {
 		solarSystemView2.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
 		
 		solarSystemView2.getRenderContext().setVertexLabelTransformer(label);
+		
 		solarSystemView2.getRenderContext().setVertexShapeTransformer(vertexSize);
 		solarSystemView2.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 		solarSystemView2.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
-		solarSystemView2.setBackground(Color.BLACK);
 		solarSystemView2.setForeground(Color.WHITE);
+		solarSystemView2.setBackground(new Color(0, 0, 0, 0));
 
 	}
 
@@ -170,40 +171,42 @@ public class Visualiser {
 			}
 		};
 		
-		//just wanted to see the edges since the background is black
-		//this can be deleted when the edges are implemented
 		Transformer<String, Paint> edgePaint = new Transformer<String, Paint>() {
 			public Paint transform(String s) {
 				return Color.WHITE;
 			}
 		};
-		//this can be deleted when the edges are implemented
 		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 
 		vv.getRenderContext().setVertexLabelTransformer(label);
 		vv.getRenderContext().setVertexShapeTransformer(vertexSize);
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
-		vv.setBackground(Color.BLACK);
+		System.out.println("components in frame : " + vv.getComponentCount());
+		
+		for(Component j :vv.getComponents()){
+			System.out.println(j);
+		}
+		vv.setBackground(new Color(0, 0, 0, 0));
 		vv.setForeground(Color.WHITE);
 	}
 
 	private void setupCanvas(
 			final ArrayList<ClassDependency> analyserOutput) {
-		starMapLayout.setSize(new Dimension((int)Screen.getPrimary().getBounds().getWidth(), (int)Screen.getPrimary().getBounds().getHeight()));
+		Dimension d = new Dimension((int)Screen.getPrimary().getBounds().getWidth(), (int)Screen.getPrimary().getBounds().getHeight());
+		starMapLayout.setSize(d);
 		starView = new VisualizationViewer<StarVertex, String>(starMapLayout);
 		solarSystemView = new VisualizationViewer<ClassDependency, CustomEdge>(
 				solarSystemLayout);
-		solarSystemLayout.setSize(new Dimension((int)Screen.getPrimary().getBounds().getWidth(), (int)Screen.getPrimary().getBounds().getHeight()));
+		solarSystemLayout.setSize(d);
 
-		solarSystemView.setSize(new Dimension((int)Screen.getPrimary().getBounds().getWidth(), (int)Screen.getPrimary().getBounds().getHeight()));
+		solarSystemView.setSize(d);
 
 		addHandlers(analyserOutput);
 		shapePlanetVertices(solarSystemView);
 		shapeStarVertices(starView);
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);  
 
-		frame.getContentPane().setBackground(Color.BLACK);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(starView);
 		frame.setVisible(true);
@@ -261,8 +264,13 @@ public class Visualiser {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getButton() == 3) {
-					frame.getContentPane().add(starView);
 					frame.remove(solarSystemView);
+					System.out.println("components in frame : " + frame.getContentPane().getComponents().length);
+					for(Component J: frame.getContentPane().getComponents()){
+						System.out.println(J);
+					}
+					frame.getContentPane().add(starView);
+					
 					frame.revalidate();
 					frame.repaint();
 				}
@@ -325,8 +333,13 @@ public class Visualiser {
 		}
 		solarSystemLayout.setGraph(solarSystem);
 		solarSystemView.setGraphLayout(solarSystemLayout);
-		frame.getContentPane().removeAll();
+		frame.getContentPane().remove(starView);
+		System.out.println("components in frame (graph selected class: " + frame.getContentPane().getComponents().length);
+		for(Component J: frame.getContentPane().getComponents()){
+			System.out.println(J);
+		}
 		frame.getContentPane().add(solarSystemView);
+		
 		frame.revalidate();
 	}
 
