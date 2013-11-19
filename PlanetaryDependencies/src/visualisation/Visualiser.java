@@ -1,50 +1,34 @@
 package visualisation;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.Stroke;
+import edu.uci.ics.jung.algorithms.layout.FRLayout;
+import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
+import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.SparseMultigraph;
+import edu.uci.ics.jung.graph.util.EdgeType;
+import edu.uci.ics.jung.visualization.VisualizationServer;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
+import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
+import edu.uci.ics.jung.visualization.picking.PickedState;
+import edu.uci.ics.jung.visualization.renderers.GradientVertexRenderer;
+import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
+import javafx.stage.Screen;
+import org.apache.commons.collections15.Transformer;
+import preprocessing.ClassDependency;
+import preprocessing.ClassDependency.Association;
+import preprocessing.ClassPacket;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
-import java.util.Collection;
-
-import javafx.stage.Screen;
-
-import javax.swing.JFrame;
-
-import org.apache.commons.collections15.Transformer;
-
-import control.Main;
-import edu.uci.ics.jung.algorithms.layout.CircleLayout;
-import edu.uci.ics.jung.algorithms.layout.FRLayout;
-import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
-import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
-import edu.uci.ics.jung.algorithms.layout.Layout;
-import edu.uci.ics.jung.algorithms.layout.SpringLayout;
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.SparseMultigraph;
-import edu.uci.ics.jung.graph.util.EdgeType;
-import edu.uci.ics.jung.visualization.BasicVisualizationServer;
-import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
-import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
-import edu.uci.ics.jung.visualization.picking.PickedState;
-import edu.uci.ics.jung.visualization.renderers.Renderer.Edge;
-import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
-import preprocessing.ClassDependency;
-import preprocessing.ClassDependency.Association;
-import preprocessing.ClassPacket;
 
 public class Visualiser {
 	VFrame frame = new VFrame("Visualiser");
@@ -59,24 +43,20 @@ public class Visualiser {
 	
 	public void process(ArrayList<ClassDependency> analyserOutput) {
 
-		// TODO perform full rendering ultimately, for now, use this to perform
-		// text output.
-		System.out.println();
-		System.out.println("Visualiser started.");
+		System.out.println("\nVisualiser started.");
 		starMap = new SparseMultigraph<StarVertex, String>();
 		solarSystem = new SparseMultigraph<ClassDependency, CustomEdge>();
 		starMapLayout = new ISOMLayout<StarVertex, String>(starMap);
-		solarSystemLayout = new FRLayout<ClassDependency, CustomEdge>(
-				solarSystem);
-		ArrayList<StarVertex> StarVertices = StarVertex
-				.classDependencyToStarVertex(analyserOutput);
-		displayPackageGraph(StarVertices);
+		solarSystemLayout = new FRLayout<ClassDependency, CustomEdge>(solarSystem);
 
+
+
+		ArrayList<StarVertex> StarVertices = StarVertex.classDependencyToStarVertex(analyserOutput);
+
+        displayPackageGraph(StarVertices);
 		displayTextOutput(analyserOutput);
 		setupCanvas(analyserOutput);
-
 	}
-
 
 	private class CustomEdge {
 		String from;
@@ -85,8 +65,7 @@ public class Visualiser {
 	}
 	
 	// Changes colour/size for planet/class vertices
-	public void shapePlanetVertices(
-			VisualizationViewer<ClassDependency, CustomEdge> solarSystemView2) {
+	public void shapePlanetVertices(final VisualizationViewer<ClassDependency, CustomEdge> solarSystemView2) {
 		Transformer<ClassDependency, Paint> vertexPaint = new Transformer<ClassDependency, Paint>() {
 			public Paint transform(ClassDependency c) {
 				// vertex will flash different colours if use the code below
@@ -99,8 +78,7 @@ public class Visualiser {
 			public Shape transform(ClassDependency i) {
 				Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
 				int r = i.lineCount / 10;
-				return AffineTransform.getScaleInstance(r, r)
-						.createTransformedShape(circle);
+				return AffineTransform.getScaleInstance(r, r).createTransformedShape(circle);
 			}
 		};
 		
@@ -115,41 +93,63 @@ public class Visualiser {
 				return i.className;
 			}
 		};
-		
-		//just wanted to see the edges since the background is black
-		//this can be deleted when the edges are implemented
+
+        Transformer<ClassDependency, Font> planetFontTransform = new Transformer<ClassDependency, Font>() {
+            @Override
+            public Font transform(ClassDependency classDependency) {
+                return new Font("Helvetica", Font.BOLD, 15);
+            }
+        };
+
 		Transformer<CustomEdge, Paint> edgePaint = new Transformer<CustomEdge, Paint>() {
 			public Paint transform(CustomEdge ce) {
 				switch(ce.type){
-				case ClassDependency.COMPOSITION:
-					return Color.WHITE;
-				case ClassDependency.AGGREGATION:
-					return Color.PINK;
-				case ClassDependency.REALIZATION:
-					return Color.CYAN;
-				default:
-					return Color.GREEN;
-					
+                    case ClassDependency.COMPOSITION:
+                        return Color.WHITE;
+                    case ClassDependency.AGGREGATION:
+                        return Color.PINK;
+                    case ClassDependency.REALIZATION:
+                        return Color.CYAN;
+                    default:
+                        return Color.GREEN;
 				}
 			}
 		};
-		//this can be deleted when the edges are implemented
+          //Adds an image to the Planet View, but doesn't let you see any planets.
+//        solarSystemView2.addPostRenderPaintable(new VisualizationViewer.Paintable(){
+//            public void paint(Graphics gr){
+//                ImageIcon img = null;
+//                try{
+//                    img = new ImageIcon(getClass().getResource("SpaceImg.jpg.jpg"));
+//                }catch (Exception ex){
+//                    System.out.println(ex.getStackTrace());
+//                }
+//                if(img != null)
+//                    gr.drawImage(img.getImage(), 0, 0, img.getIconWidth(), img.getIconHeight(),solarSystemView2);
+//            }
+//            public boolean useTransform(){
+//                return false;
+//            }
+//        });
+
+
 		solarSystemView2.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 		solarSystemView2.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
 		
 		solarSystemView2.getRenderContext().setVertexLabelTransformer(label);
+        solarSystemView2.getRenderContext().setVertexFontTransformer(planetFontTransform);
 		
 		solarSystemView2.getRenderContext().setVertexShapeTransformer(vertexSize);
 		solarSystemView2.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 		solarSystemView2.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
-		solarSystemView2.setForeground(Color.WHITE);
-		solarSystemView2.setBackground(new Color(0, 0, 0, 0));
+		solarSystemView2.setForeground(Color.white);
+		solarSystemView2.setBackground(Color.BLACK);
+
 
 	}
 
 	// Changes colour/size for star/package vertices
-	public void shapeStarVertices(
-			VisualizationViewer<StarVertex, String> vv) {
+	public void shapeStarVertices(VisualizationViewer<StarVertex, String> vv) {
 		Transformer<StarVertex, Paint> vertexPaint = new Transformer<StarVertex, Paint>() {
 			public Paint transform(StarVertex s) {
 				return new Color(255, 255, 0);
@@ -160,26 +160,39 @@ public class Visualiser {
 			public Shape transform(StarVertex s) {
 				Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
 				int radius = s.starSize*2;
-				return AffineTransform.getScaleInstance(radius, radius)
-						.createTransformedShape(circle);
+				return AffineTransform.getScaleInstance(radius, radius).createTransformedShape(circle);
 			}
 		};
 
 		Transformer<StarVertex, String> label = new Transformer<StarVertex, String>() {
 			public String transform(StarVertex i) {
-				return i.toString();
+                int relevantIndex = 13;
+                if (i.starName.contains("stuffplotter"))
+                    return i.starName.substring(relevantIndex);
+                return i.toString();
 			}
 		};
+
+        Transformer<StarVertex, Font> fontTransform = new Transformer<StarVertex, Font>() {
+            @Override
+            public Font transform(StarVertex starVertex) {
+                return new Font("Helvetica", Font.BOLD, 15);
+            }
+        };
 		
 		Transformer<String, Paint> edgePaint = new Transformer<String, Paint>() {
 			public Paint transform(String s) {
 				return Color.WHITE;
 			}
 		};
-		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 
+
+		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 		vv.getRenderContext().setVertexLabelTransformer(label);
+
+        vv.getRenderContext().setVertexFontTransformer(fontTransform);
 		vv.getRenderContext().setVertexShapeTransformer(vertexSize);
+
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 		System.out.println("components in frame : " + vv.getComponentCount());
@@ -188,32 +201,37 @@ public class Visualiser {
 			System.out.println(j);
 		}
 		vv.setBackground(new Color(0, 0, 0, 0));
-		vv.setForeground(Color.WHITE);
+		vv.setForeground(Color.lightGray);
 	}
 
-	private void setupCanvas(
-			final ArrayList<ClassDependency> analyserOutput) {
-		Dimension d = new Dimension((int)Screen.getPrimary().getBounds().getWidth(), (int)Screen.getPrimary().getBounds().getHeight());
-		starMapLayout.setSize(d);
+	private void setupCanvas(final ArrayList<ClassDependency> analyserOutput) {
+		starMapLayout.setSize(GetDimension());
 		starView = new VisualizationViewer<StarVertex, String>(starMapLayout);
-		solarSystemView = new VisualizationViewer<ClassDependency, CustomEdge>(
-				solarSystemLayout);
-		solarSystemLayout.setSize(d);
-
-		solarSystemView.setSize(d);
+		solarSystemView = new VisualizationViewer<ClassDependency, CustomEdge>(solarSystemLayout);
+		solarSystemLayout.setSize(GetDimension());
+		solarSystemView.setSize(GetDimension());
 
 		addHandlers(analyserOutput);
 		shapePlanetVertices(solarSystemView);
 		shapeStarVertices(starView);
-		frame.setExtendedState(Frame.MAXIMIZED_BOTH);  
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(starView);
-		frame.setVisible(true);
+		SetSwingValues();
 	}
 
-	private void addHandlers(
-			final ArrayList<ClassDependency> analyserOutput) {
+    private Dimension GetDimension(){
+          int width = (int) Screen.getPrimary().getBounds().getWidth();
+          int height = (int) Screen.getPrimary().getBounds().getHeight();
+          return new Dimension(width, height);
+    }
+
+    private void SetSwingValues(){
+        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(starView);
+        frame.setVisible(true);
+    }
+
+	private void addHandlers(final ArrayList<ClassDependency> analyserOutput) {
 		DefaultModalGraphMouse<String, String> mouse = new DefaultModalGraphMouse<String, String>();
 		mouse.setMode(Mode.PICKING);
 		starView.setGraphMouse(mouse);
@@ -300,8 +318,7 @@ public class Visualiser {
 		});
 	}
 
-	protected void graphSelectedClassSolarSystem(StarVertex vertex,
-			ArrayList<ClassDependency> list) {
+	protected void graphSelectedClassSolarSystem(StarVertex vertex, ArrayList<ClassDependency> list) {
 		solarSystem = new SparseMultigraph<ClassDependency, CustomEdge>();
 
 		for (ClassDependency cd : list) {
@@ -312,40 +329,33 @@ public class Visualiser {
 		for (ClassDependency cd : list) {
 			if (cd.packageName.equals(vertex.toString())) {
 				for (Association a : cd.associations) {
-					ClassDependency temp = findClassDependency(
-							a.associatedWith, list);
+					ClassDependency temp = findClassDependency(a.associatedWith, list);
 					solarSystem.addVertex(temp);
 					CustomEdge ce = new CustomEdge();
 					ce.from=cd.className;
 					ce.to=a.associatedWith;
 					ce.type=a.associationType;
 					if(ce.type==ClassDependency.UNIDIRECTIONAL_ASSOCIATION){
-						solarSystem.addEdge(ce,
-								cd, temp,EdgeType.DIRECTED);
+						solarSystem.addEdge(ce, cd, temp,EdgeType.DIRECTED);
+					}else{
+						solarSystem.addEdge(ce,cd, temp,EdgeType.UNDIRECTED);
 					}
-					else{
-						solarSystem.addEdge(ce,
-								cd, temp,EdgeType.UNDIRECTED);
-					}					
-					
 				}
 			}
 		}
 		solarSystemLayout.setGraph(solarSystem);
 		solarSystemView.setGraphLayout(solarSystemLayout);
 		frame.getContentPane().remove(starView);
+
 		System.out.println("components in frame (graph selected class: " + frame.getContentPane().getComponents().length);
 		for(Component J: frame.getContentPane().getComponents()){
 			System.out.println(J);
 		}
 		frame.getContentPane().add(solarSystemView);
-		
 		frame.revalidate();
 	}
 
-	private ClassDependency findClassDependency(String associatedWith,
-			ArrayList<ClassDependency> list) {
-
+	private ClassDependency findClassDependency(String associatedWith, ArrayList<ClassDependency> list) {
 		for (ClassDependency cd : list) {
 			if (cd.className.equals(associatedWith))
 				return cd;
@@ -360,16 +370,14 @@ public class Visualiser {
 		for (StarVertex sv : starVertices) {
 			for (Association a : sv.associations) {
 				StarVertex s = packageNameOf(a.associatedWith, starVertices);
-				System.out.println(sv.toString() + "associated w/ "
-						+ s.toString());
+				System.out.println(sv.toString() + "associated w/ " + s.toString());
 				starMap.addEdge(sv.starName + "-" + s, sv, s);
 			}
 		}
 
 	}
 
-	private StarVertex packageNameOf(String associatedWith,
-			ArrayList<StarVertex> starVertices) {
+	private StarVertex packageNameOf(String associatedWith, ArrayList<StarVertex> starVertices) {
 		for (StarVertex sv : starVertices) {
 			if (sv.starName.equals(associatedWith)) {
 				return sv;
@@ -378,7 +386,6 @@ public class Visualiser {
 		return null;
 	}
 
-	// not used
 	/*
 	 * private static void drawClassGraph(ArrayList<ClassDependency> list) {
 	 * 
@@ -393,9 +400,7 @@ public class Visualiser {
 	 * "BI-DIRECTIONAL ASSOCIATION"; break; } starMap.addEdge(cd.className + "-"
 	 * + a.associatedWith, cd.className, a.associatedWith); } } }
 	 */
-
-	private static void displayTextOutput(
-			ArrayList<ClassDependency> analyserOutput) {
+	private static void displayTextOutput(ArrayList<ClassDependency> analyserOutput) {
 		for (ClassDependency cd : analyserOutput) {
 			System.out
 					.println("-------------------Scanning Planet-----------------");
@@ -429,11 +434,7 @@ public class Visualiser {
 					}
 				}
 			}
-			System.out
-					.println("----------------------End Scan---------------------");
-			System.out.println();
-
+			System.out.println("----------------------End Scan---------------------\n");
 		}
 	}
-
 }

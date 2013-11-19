@@ -24,8 +24,7 @@ public class StarVertex {
 		return starName;
 	}
 
-	public static ArrayList<StarVertex> classDependencyToStarVertex(
-			ArrayList<ClassDependency> cList) {
+	public static ArrayList<StarVertex> classDependencyToStarVertex(ArrayList<ClassDependency> cList) {
 		int i = 0;
 		classDependencyList = cList;
 		ArrayList<StarVertex> stars = new ArrayList<StarVertex>();
@@ -55,8 +54,7 @@ public class StarVertex {
 		return stars;
 	}
 
-	public static ArrayList<Association> getPackageAssociations(
-			ArrayList<Association> classAssList, String packageName) {
+	public static ArrayList<Association> getPackageAssociations(ArrayList<Association> classAssList, String packageName) {
 		ArrayList<Association> aList = new ArrayList<Association>();
 		Association a = null;
 		ArrayList<ClassDependency> cdList = classDependencyList;
@@ -74,8 +72,7 @@ public class StarVertex {
 		return aList;
 	}
 	
-	public static int numberOfClassesInPackage(String packageName){
-		ArrayList<ClassDependency> cdList = classDependencyList;
+	public static int numberOfClassesInPackage(String packageName){ArrayList<ClassDependency> cdList = classDependencyList;
 		int num = 0;
 		for(ClassDependency cd: cdList){
 			if(cd.packageName.equals(packageName)){

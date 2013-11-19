@@ -29,7 +29,7 @@ public class VFrame extends JFrame {
 	}
 	
 	public static void main(String[] args){
-		            VFrame frame = new VFrame("");    
+        VFrame frame = new VFrame("");
 	}
 	  
     protected class PaintPane extends JPanel {
@@ -45,7 +45,6 @@ public class VFrame extends JFrame {
     			g.drawLine(locX, locY, locX, locY);
     		}
     		this.setBackground(Color.BLACK);
-    		
     	}
     }
 
