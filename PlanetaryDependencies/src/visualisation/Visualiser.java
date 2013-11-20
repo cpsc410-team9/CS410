@@ -1,9 +1,6 @@
 package visualisation;
 
-import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
-import edu.uci.ics.jung.algorithms.layout.FRLayout;
-import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
-import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.algorithms.layout.*;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
@@ -34,7 +31,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.Collection;
-
 public class Visualiser {
 	JFrame frame = new JFrame("Visualiser");
 	public ClassPacket test;
@@ -87,6 +83,14 @@ public class Visualiser {
 			}
 		};
 
+        Transformer<CustomEdge, Stroke> planetEdgeThickness = new Transformer<CustomEdge, Stroke>() {
+            float planetEdgeDash[] = {5.0f};
+            @Override
+            public Stroke transform(CustomEdge customEdge) {
+                return new BasicStroke(2.0f, BasicStroke.CAP_SQUARE, BasicStroke.CAP_SQUARE, 10.0f, planetEdgeDash, 0.0f);
+            }
+        };
+
 		Transformer<CustomEdge, Paint> edgePaint = new Transformer<CustomEdge, Paint>() {
 			public Paint transform(CustomEdge ce) {
 				switch(ce.type){
@@ -102,7 +106,6 @@ public class Visualiser {
 			}
 		};
 		Transformer<ClassDependency, Icon> highlightIcon = new Transformer<ClassDependency, Icon>(){
-
 			@Override
 			public Icon transform(final ClassDependency c) {
 				final int radius = c.lineCount/20;
@@ -119,8 +122,7 @@ public class Visualiser {
 					}
 
 					@Override
-					public void paintIcon(Component arg0, Graphics g,
-							int x, int y) {
+					public void paintIcon(Component arg0, Graphics g, int x, int y) {
 						Graphics2D g2 = (Graphics2D)g;
 						g2.setColor(c.colour);
 						g2.fillOval(x,y,radius,radius);
@@ -135,26 +137,27 @@ public class Visualiser {
 							}
 						}catch(Exception e){};
 						g2.drawOval(x, y, radius, radius);
-
 					}
 				};
 			}
 
 		};
+
+        //Edge and Arrow Properties
 		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 		vv.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
+        vv.getRenderContext().setEdgeStrokeTransformer(planetEdgeThickness);
 
+        //Vertex Properties
 		vv.getRenderContext().setVertexLabelTransformer(label);
 		vv.getRenderContext().setVertexFontTransformer(planetFontTransform);
-
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 		vv.setBackground(Color.black);
 		vv.setForeground(Color.white);
-
 		vv.getRenderContext().setVertexIconTransformer(highlightIcon);
 	}
-	public void selectedPlanetVertices(final VisualizationViewer<ClassDependency, CustomEdge> vv, final ClassDependency cd) {
 
+	public void selectedPlanetVertices(final VisualizationViewer<ClassDependency, CustomEdge> vv, final ClassDependency cd) {
 		Transformer<ClassDependency, String> label = new Transformer<ClassDependency, String>() {
 			public String transform(ClassDependency i) {
 				return i.className;
@@ -203,22 +206,23 @@ public class Visualiser {
 					}
 
 					@Override
-					public void paintIcon(Component arg0, Graphics g,
-							int x, int y) {
+					public void paintIcon(Component arg0, Graphics g, int x, int y) {
 						if(c.className.equals(cd.className)){
-							Graphics2D g2 = (Graphics2D)g;
+							Graphics2D g2 = (Graphics2D) g;
 							g2.setColor(c.colour);
 							g2.fillOval(x,y,radius,radius);
 							try{
 								if(c.packageName.equals(currentSolarSystem)){
 									//change outline colour in next line
-									g2.setColor(Color.YELLOW);
-									//RadialGradientPaint gp = new RadialGradientPaint(x+(radius/2), y+(radius/2), radius, new float[] { 0.0f, 1f }, new Color[] {Color.blue, Color.white});
-									//g2.setPaint(gp);
-									float outline = (float) (radius*(0.1) > 5? radius*(0.1) : 5f);
+									g2.setColor(Color.RED);
+//									RadialGradientPaint gp = new RadialGradientPaint(x+(radius/2), y+(radius/2), radius, new float[] { 0.0f, 1f }, new Color[] {Color.blue, Color.white});
+//									g2.setPaint(gp);
+									float outline = (float) (radius*(0.1) > 5 ? radius*(0.1) : 5f);
 									g2.setStroke(new BasicStroke(outline));
 								}
-							}catch(Exception e){};
+							}catch(Exception e){
+                                e.printStackTrace();
+                            };
 						}
 						else{
 							Graphics2D g2 = (Graphics2D)g;
@@ -231,9 +235,7 @@ public class Visualiser {
 							}
 							g2.fillOval(x,y,radius,radius);
 							g2.drawOval(x, y, radius, radius);
-
 						}
-
 					}
 				};
 			}
@@ -251,11 +253,13 @@ public class Visualiser {
 
 		vv.getRenderContext().setVertexIconTransformer(highlightIcon);
 	}
+
 	// Changes colour/size for star/package vertices
 	public void shapeStarVertices(VisualizationViewer<StarVertex, String> vv) {
 		Transformer<StarVertex, Paint> vertexPaint = new Transformer<StarVertex, Paint>() {
 			public Paint transform(StarVertex s) {
-				return new Color(255, 255, 0);
+                //Gradient Transformer is below.
+				return new Color(255,255,0);
 			}
 		};
 
@@ -286,19 +290,30 @@ public class Visualiser {
 
 		Transformer<String, Paint> edgePaint = new Transformer<String, Paint>() {
 			public Paint transform(String s) {
-				return Color.WHITE;
+				return new Color(177,156,217);
 			}
 		};
+        //From StackOverflow
+        Transformer<String, Stroke> edgeThickness = new Transformer<String, Stroke>() {
+            float dash[] = { 5.0f };
+            public Stroke transform(String s) {
+                return new BasicStroke(2.0f, BasicStroke.CAP_SQUARE, BasicStroke.CAP_SQUARE, 10.0f, dash, 0.0f);
+            }
+        };
 
+        //Transformer Edge Setters
+        vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
+        vv.getRenderContext().setEdgeStrokeTransformer(edgeThickness);
 
-		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
+        //Transformer Vertex Setters
 		vv.getRenderContext().setVertexLabelTransformer(label);
-
 		vv.getRenderContext().setVertexFontTransformer(fontTransform);
 		vv.getRenderContext().setVertexShapeTransformer(vertexShape);
-
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
+        //GradientVertex.
+        vv.getRenderer().setVertexRenderer(new GradientVertexRenderer<StarVertex,String>(Color.white, Color.red, false));
+
 		System.out.println("components in frame : " + vv.getComponentCount());
 
 		for(Component j :vv.getComponents()){
@@ -449,7 +464,7 @@ public class Visualiser {
 				}
 			}
 		}
-		solarSystem.addVertex(new ClassDependency(currentSolarSystem,500));
+		solarSystem.addVertex(new ClassDependency(currentSolarSystem, 500));
 		solarSystemLayout.setGraph(solarSystem);
 		solarSystemView.setGraphLayout(solarSystemLayout);
 		frame.getContentPane().remove(starView);
@@ -504,8 +519,7 @@ public class Visualiser {
 	 */
 	private static void displayTextOutput(ArrayList<ClassDependency> analyserOutput) {
 		for (ClassDependency cd : analyserOutput) {
-			System.out
-			.println("-------------------Scanning Planet-----------------");
+			System.out.println("-------------------Scanning Planet-----------------");
 			System.out.println("Planet: " + cd.className);
 			System.out.println("  Planet radius: " + cd.planetaryRadius);
 			System.out.println("  Solar System: " + cd.packageName);
@@ -532,7 +546,6 @@ public class Visualiser {
 					case 4:
 						System.out.println("BI-DIRECTIONAL ASSOCIATION");
 						break;
-
 					}
 				}
 			}
