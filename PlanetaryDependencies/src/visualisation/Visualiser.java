@@ -1,5 +1,6 @@
 package visualisation;
 
+import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
@@ -15,12 +16,15 @@ import edu.uci.ics.jung.visualization.picking.PickedState;
 import edu.uci.ics.jung.visualization.renderers.GradientVertexRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import javafx.stage.Screen;
+
 import org.apache.commons.collections15.Transformer;
+
 import preprocessing.ClassDependency;
 import preprocessing.ClassDependency.Association;
 import preprocessing.ClassPacket;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -29,6 +33,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class Visualiser {
 	VFrame frame = new VFrame("Visualiser");
@@ -40,7 +45,8 @@ public class Visualiser {
 
 	Layout<StarVertex, String> starMapLayout;
 	Layout<ClassDependency, CustomEdge> solarSystemLayout;
-	
+	String currentSolarSystem = "";
+
 	public void process(ArrayList<ClassDependency> analyserOutput) {
 
 		System.out.println("\nVisualiser started.");
@@ -65,28 +71,8 @@ public class Visualiser {
 	}
 	
 	// Changes colour/size for planet/class vertices
-	public void shapePlanetVertices(final VisualizationViewer<ClassDependency, CustomEdge> solarSystemView2) {
-		Transformer<ClassDependency, Paint> vertexPaint = new Transformer<ClassDependency, Paint>() {
-			public Paint transform(ClassDependency c) {
-				// vertex will flash different colours if use the code below
-				// return new Color((float) Math.random(),(float)
-				// Math.random(),(float) Math.random());
-				return c.colour;
-			}
-		};
-		Transformer<ClassDependency, Shape> vertexSize = new Transformer<ClassDependency, Shape>() {
-			public Shape transform(ClassDependency i) {
-				Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
-				int r = i.lineCount / 10;
-				return AffineTransform.getScaleInstance(r, r).createTransformedShape(circle);
-			}
-		};
-		
-		Transformer<ClassDependency, Integer> labelOffset = new Transformer<ClassDependency, Integer>(){
-			public Integer transform(ClassDependency i){
-				return 5 + (i.lineCount/10);
-			}
-		};
+
+	public void shapePlanetVertices(final VisualizationViewer<ClassDependency, CustomEdge> vv) {
 
 		Transformer<ClassDependency, String> label = new Transformer<ClassDependency, String>() {
 			public String transform(ClassDependency i) {
@@ -115,37 +101,55 @@ public class Visualiser {
 				}
 			}
 		};
-          //Adds an image to the Planet View, but doesn't let you see any planets.
-//        solarSystemView2.addPostRenderPaintable(new VisualizationViewer.Paintable(){
-//            public void paint(Graphics gr){
-//                ImageIcon img = null;
-//                try{
-//                    img = new ImageIcon(getClass().getResource("SpaceImg.jpg.jpg"));
-//                }catch (Exception ex){
-//                    System.out.println(ex.getStackTrace());
-//                }
-//                if(img != null)
-//                    gr.drawImage(img.getImage(), 0, 0, img.getIconWidth(), img.getIconHeight(),solarSystemView2);
-//            }
-//            public boolean useTransform(){
-//                return false;
-//            }
-//        });
+		Transformer<ClassDependency, Icon> highlightIcon = new Transformer<ClassDependency, Icon>(){
 
+			@Override
+			public Icon transform(final ClassDependency c) {
+				final int radius = c.lineCount/10;
+				return new Icon(){
 
-		solarSystemView2.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
-		solarSystemView2.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
+					@Override
+					public int getIconHeight() {
+						return radius;
+					}
+
+					@Override
+					public int getIconWidth() {
+						return radius;
+					}
+
+					@Override
+					public void paintIcon(Component arg0, Graphics g,
+							int x, int y) {
+						Graphics2D g2 = (Graphics2D)g;
+						g2.setColor(c.colour);
+						g2.fillOval(x,y,radius,radius);
+						if(c.packageName.equals(currentSolarSystem)){
+//change outline colour in next line
+							g2.setColor(Color.YELLOW);
+							//RadialGradientPaint gp = new RadialGradientPaint(x+(radius/2), y+(radius/2), radius, new float[] { 0.0f, 1f }, new Color[] {Color.blue, Color.white});
+							//g2.setPaint(gp);
+							float outline = (float) (radius*(0.1) > 5? radius*(0.1) : 5f);
+							g2.setStroke(new BasicStroke(outline));
+						}
+						g2.drawOval(x, y, radius, radius);
+						
+					}
+				};
+			}
+			
+		};
+		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
+		vv.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
 		
-		solarSystemView2.getRenderContext().setVertexLabelTransformer(label);
-        solarSystemView2.getRenderContext().setVertexFontTransformer(planetFontTransform);
+		vv.getRenderContext().setVertexLabelTransformer(label);
+        vv.getRenderContext().setVertexFontTransformer(planetFontTransform);
+	
+		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
+		vv.setBackground(new Color(0,0,0,0));
+		vv.setForeground(Color.white);
 		
-		solarSystemView2.getRenderContext().setVertexShapeTransformer(vertexSize);
-		solarSystemView2.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
-		solarSystemView2.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
-		solarSystemView2.setForeground(Color.white);
-		solarSystemView2.setBackground(Color.BLACK);
-
-
+		vv.getRenderContext().setVertexIconTransformer(highlightIcon);
 	}
 
 	// Changes colour/size for star/package vertices
@@ -156,10 +160,11 @@ public class Visualiser {
 			}
 		};
 
-		Transformer<StarVertex, Shape> vertexSize = new Transformer<StarVertex, Shape>() {
+		Transformer<StarVertex, Shape> vertexShape = new Transformer<StarVertex, Shape>() {
 			public Shape transform(StarVertex s) {
 				Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
 				int radius = s.starSize*2;
+				
 				return AffineTransform.getScaleInstance(radius, radius).createTransformedShape(circle);
 			}
 		};
@@ -191,7 +196,7 @@ public class Visualiser {
 		vv.getRenderContext().setVertexLabelTransformer(label);
 
         vv.getRenderContext().setVertexFontTransformer(fontTransform);
-		vv.getRenderContext().setVertexShapeTransformer(vertexSize);
+		vv.getRenderContext().setVertexShapeTransformer(vertexShape);
 
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
@@ -324,6 +329,7 @@ public class Visualiser {
 		for (ClassDependency cd : list) {
 			if (cd.packageName.equals(vertex.toString())) {
 				solarSystem.addVertex(cd);
+				currentSolarSystem = vertex.toString();
 			}
 		}
 		for (ClassDependency cd : list) {
@@ -343,14 +349,10 @@ public class Visualiser {
 				}
 			}
 		}
+		solarSystem.addVertex(new ClassDependency(currentSolarSystem,500));
 		solarSystemLayout.setGraph(solarSystem);
 		solarSystemView.setGraphLayout(solarSystemLayout);
 		frame.getContentPane().remove(starView);
-
-		System.out.println("components in frame (graph selected class: " + frame.getContentPane().getComponents().length);
-		for(Component J: frame.getContentPane().getComponents()){
-			System.out.println(J);
-		}
 		frame.getContentPane().add(solarSystemView);
 		frame.revalidate();
 	}
