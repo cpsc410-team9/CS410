@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class Visualiser {
-	VFrame frame = new VFrame("Visualiser");
+	JFrame frame = new JFrame("Visualiser");
 	public ClassPacket test;
 	public Graph<StarVertex, String> starMap;
 	public Graph<ClassDependency, CustomEdge> solarSystem;
@@ -59,7 +59,7 @@ public class Visualiser {
 
 		ArrayList<StarVertex> StarVertices = StarVertex.classDependencyToStarVertex(analyserOutput);
 
-        displayPackageGraph(StarVertices);
+		displayPackageGraph(StarVertices);
 		displayTextOutput(analyserOutput);
 		setupCanvas(analyserOutput);
 	}
@@ -69,7 +69,7 @@ public class Visualiser {
 		String to;
 		int type;
 	}
-	
+
 	// Changes colour/size for planet/class vertices
 
 	public void shapePlanetVertices(final VisualizationViewer<ClassDependency, CustomEdge> vv) {
@@ -80,24 +80,24 @@ public class Visualiser {
 			}
 		};
 
-        Transformer<ClassDependency, Font> planetFontTransform = new Transformer<ClassDependency, Font>() {
-            @Override
-            public Font transform(ClassDependency classDependency) {
-                return new Font("Helvetica", Font.BOLD, 15);
-            }
-        };
+		Transformer<ClassDependency, Font> planetFontTransform = new Transformer<ClassDependency, Font>() {
+			@Override
+			public Font transform(ClassDependency classDependency) {
+				return new Font("Helvetica", Font.BOLD, 15);
+			}
+		};
 
 		Transformer<CustomEdge, Paint> edgePaint = new Transformer<CustomEdge, Paint>() {
 			public Paint transform(CustomEdge ce) {
 				switch(ce.type){
-                    case ClassDependency.COMPOSITION:
-                        return Color.WHITE;
-                    case ClassDependency.AGGREGATION:
-                        return Color.PINK;
-                    case ClassDependency.REALIZATION:
-                        return Color.CYAN;
-                    default:
-                        return Color.GREEN;
+				case ClassDependency.COMPOSITION:
+					return Color.WHITE;
+				case ClassDependency.AGGREGATION:
+					return Color.PINK;
+				case ClassDependency.REALIZATION:
+					return Color.CYAN;
+				default:
+					return Color.GREEN;
 				}
 			}
 		};
@@ -105,7 +105,7 @@ public class Visualiser {
 
 			@Override
 			public Icon transform(final ClassDependency c) {
-				final int radius = c.lineCount/10;
+				final int radius = c.lineCount/20;
 				return new Icon(){
 
 					@Override
@@ -124,34 +124,133 @@ public class Visualiser {
 						Graphics2D g2 = (Graphics2D)g;
 						g2.setColor(c.colour);
 						g2.fillOval(x,y,radius,radius);
-						if(c.packageName.equals(currentSolarSystem)){
-//change outline colour in next line
-							g2.setColor(Color.YELLOW);
-							//RadialGradientPaint gp = new RadialGradientPaint(x+(radius/2), y+(radius/2), radius, new float[] { 0.0f, 1f }, new Color[] {Color.blue, Color.white});
-							//g2.setPaint(gp);
-							float outline = (float) (radius*(0.1) > 5? radius*(0.1) : 5f);
-							g2.setStroke(new BasicStroke(outline));
-						}
+						try{
+							if(c.packageName.equals(currentSolarSystem)){
+								//change outline colour in next line
+								g2.setColor(Color.YELLOW);
+								//RadialGradientPaint gp = new RadialGradientPaint(x+(radius/2), y+(radius/2), radius, new float[] { 0.0f, 1f }, new Color[] {Color.blue, Color.white});
+								//g2.setPaint(gp);
+								float outline = (float) (radius*(0.1) > 5? radius*(0.1) : 5f);
+								g2.setStroke(new BasicStroke(outline));
+							}
+						}catch(Exception e){};
 						g2.drawOval(x, y, radius, radius);
-						
+
 					}
 				};
 			}
-			
+
 		};
 		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 		vv.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
-		
+
 		vv.getRenderContext().setVertexLabelTransformer(label);
-        vv.getRenderContext().setVertexFontTransformer(planetFontTransform);
-	
+		vv.getRenderContext().setVertexFontTransformer(planetFontTransform);
+
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
-		vv.setBackground(new Color(0,0,0,0));
+		vv.setBackground(Color.black);
 		vv.setForeground(Color.white);
-		
+
 		vv.getRenderContext().setVertexIconTransformer(highlightIcon);
 	}
+	public void selectedPlanetVertices(final VisualizationViewer<ClassDependency, CustomEdge> vv, final ClassDependency cd) {
 
+		Transformer<ClassDependency, String> label = new Transformer<ClassDependency, String>() {
+			public String transform(ClassDependency i) {
+				return i.className;
+			}
+		};
+
+		Transformer<ClassDependency, Font> planetFontTransform = new Transformer<ClassDependency, Font>() {
+			@Override
+			public Font transform(ClassDependency classDependency) {
+				return new Font("Helvetica", Font.BOLD, 15);
+			}
+		};
+
+		Transformer<CustomEdge, Paint> edgePaint = new Transformer<CustomEdge, Paint>() {
+			public Paint transform(CustomEdge ce) {
+				if(ce.from.equals(cd.className)){
+					switch(ce.type){
+					case ClassDependency.COMPOSITION:
+						return Color.WHITE;
+					case ClassDependency.AGGREGATION:
+						return Color.PINK;
+					case ClassDependency.REALIZATION:
+						return Color.CYAN;
+					default:
+						return Color.GREEN;
+					}
+				}
+				else return Color.gray;
+			}
+		};
+		Transformer<ClassDependency, Icon> highlightIcon = new Transformer<ClassDependency, Icon>(){
+
+			@Override
+			public Icon transform(final ClassDependency c) {
+				final int radius = c.lineCount/20;
+				return new Icon(){
+
+					@Override
+					public int getIconHeight() {
+						return radius;
+					}
+
+					@Override
+					public int getIconWidth() {
+						return radius;
+					}
+
+					@Override
+					public void paintIcon(Component arg0, Graphics g,
+							int x, int y) {
+						if(c.className.equals(cd.className)){
+							Graphics2D g2 = (Graphics2D)g;
+							g2.setColor(c.colour);
+							g2.fillOval(x,y,radius,radius);
+							try{
+								if(c.packageName.equals(currentSolarSystem)){
+									//change outline colour in next line
+									g2.setColor(Color.YELLOW);
+									//RadialGradientPaint gp = new RadialGradientPaint(x+(radius/2), y+(radius/2), radius, new float[] { 0.0f, 1f }, new Color[] {Color.blue, Color.white});
+									//g2.setPaint(gp);
+									float outline = (float) (radius*(0.1) > 5? radius*(0.1) : 5f);
+									g2.setStroke(new BasicStroke(outline));
+								}
+							}catch(Exception e){};
+						}
+						else{
+							Graphics2D g2 = (Graphics2D)g;
+							g2.setColor(Color.gray);
+							for(Association a : cd.associations){
+								if(a.associatedWith.equals(c.className)){
+									g2.setColor(c.colour);
+									break;
+								}
+							}
+							g2.fillOval(x,y,radius,radius);
+							g2.drawOval(x, y, radius, radius);
+
+						}
+
+					}
+				};
+			}
+
+		};
+		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
+		vv.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
+
+		vv.getRenderContext().setVertexLabelTransformer(label);
+		vv.getRenderContext().setVertexFontTransformer(planetFontTransform);
+
+		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
+		vv.setBackground(Color.black);
+		vv.setForeground(Color.white);
+
+		vv.getRenderContext().setVertexIconTransformer(highlightIcon);
+	}
 	// Changes colour/size for star/package vertices
 	public void shapeStarVertices(VisualizationViewer<StarVertex, String> vv) {
 		Transformer<StarVertex, Paint> vertexPaint = new Transformer<StarVertex, Paint>() {
@@ -164,27 +263,27 @@ public class Visualiser {
 			public Shape transform(StarVertex s) {
 				Ellipse2D circle = new Ellipse2D.Double(-1, -1, 2, 2);
 				int radius = s.starSize*2;
-				
+
 				return AffineTransform.getScaleInstance(radius, radius).createTransformedShape(circle);
 			}
 		};
 
 		Transformer<StarVertex, String> label = new Transformer<StarVertex, String>() {
 			public String transform(StarVertex i) {
-                int relevantIndex = 13;
-                if (i.starName.contains("stuffplotter"))
-                    return i.starName.substring(relevantIndex);
-                return i.toString();
+				int relevantIndex = 13;
+				if (i.starName.contains("stuffplotter"))
+					return i.starName.substring(relevantIndex);
+				else return i.toString();
 			}
 		};
 
-        Transformer<StarVertex, Font> fontTransform = new Transformer<StarVertex, Font>() {
-            @Override
-            public Font transform(StarVertex starVertex) {
-                return new Font("Helvetica", Font.BOLD, 15);
-            }
-        };
-		
+		Transformer<StarVertex, Font> fontTransform = new Transformer<StarVertex, Font>() {
+			@Override
+			public Font transform(StarVertex starVertex) {
+				return new Font("Helvetica", Font.BOLD, 15);
+			}
+		};
+
 		Transformer<String, Paint> edgePaint = new Transformer<String, Paint>() {
 			public Paint transform(String s) {
 				return Color.WHITE;
@@ -195,17 +294,17 @@ public class Visualiser {
 		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 		vv.getRenderContext().setVertexLabelTransformer(label);
 
-        vv.getRenderContext().setVertexFontTransformer(fontTransform);
+		vv.getRenderContext().setVertexFontTransformer(fontTransform);
 		vv.getRenderContext().setVertexShapeTransformer(vertexShape);
 
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 		System.out.println("components in frame : " + vv.getComponentCount());
-		
+
 		for(Component j :vv.getComponents()){
 			System.out.println(j);
 		}
-		vv.setBackground(new Color(0, 0, 0, 0));
+		vv.setBackground(Color.black);
 		vv.setForeground(Color.lightGray);
 	}
 
@@ -223,18 +322,18 @@ public class Visualiser {
 		SetSwingValues();
 	}
 
-    private Dimension GetDimension(){
-          int width = (int) Screen.getPrimary().getBounds().getWidth();
-          int height = (int) Screen.getPrimary().getBounds().getHeight();
-          return new Dimension(width, height);
-    }
+	private Dimension GetDimension(){
+		int width = (int) Screen.getPrimary().getBounds().getWidth();
+		int height = (int) Screen.getPrimary().getBounds().getHeight();
+		return new Dimension(width, height);
+	}
 
-    private void SetSwingValues(){
-        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(starView);
-        frame.setVisible(true);
-    }
+	private void SetSwingValues(){
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().add(starView);
+		frame.setVisible(true);
+	}
 
 	private void addHandlers(final ArrayList<ClassDependency> analyserOutput) {
 		DefaultModalGraphMouse<String, String> mouse = new DefaultModalGraphMouse<String, String>();
@@ -276,6 +375,7 @@ public class Visualiser {
 					if (pickedState2.isPicked(vertex)) {
 						System.out.println("Planet: " + vertex.className
 								+ "\nSolar System: " + vertex.packageName);
+						selectedPlanetVertices(solarSystemView, vertex);
 					} else {
 					}
 				}
@@ -293,7 +393,7 @@ public class Visualiser {
 						System.out.println(J);
 					}
 					frame.getContentPane().add(starView);
-					
+
 					frame.revalidate();
 					frame.repaint();
 				}
@@ -354,7 +454,7 @@ public class Visualiser {
 		solarSystemView.setGraphLayout(solarSystemLayout);
 		frame.getContentPane().remove(starView);
 		frame.getContentPane().add(solarSystemView);
-		frame.revalidate();
+		frame.repaint();
 	}
 
 	private ClassDependency findClassDependency(String associatedWith, ArrayList<ClassDependency> list) {
@@ -405,7 +505,7 @@ public class Visualiser {
 	private static void displayTextOutput(ArrayList<ClassDependency> analyserOutput) {
 		for (ClassDependency cd : analyserOutput) {
 			System.out
-					.println("-------------------Scanning Planet-----------------");
+			.println("-------------------Scanning Planet-----------------");
 			System.out.println("Planet: " + cd.className);
 			System.out.println("  Planet radius: " + cd.planetaryRadius);
 			System.out.println("  Solar System: " + cd.packageName);
