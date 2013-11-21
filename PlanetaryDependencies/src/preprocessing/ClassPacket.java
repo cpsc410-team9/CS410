@@ -26,10 +26,21 @@ public class ClassPacket {
 		if (!associatedWith.contains(newClass))
 			associatedWith.add(newClass);
 	}
+	/**
+	 * list of all the statically accessed classes in newClass
+	 * @param newClass
+	 *void
+	 */
 	public void addToStaticAccess(String newClass){
 		if(!staticAccess.contains(newClass))
 			staticAccess.add(newClass);
 	}
+	
+	/**
+	 * list of classes that newClass instantiated
+	 * @param newClass
+	 *void
+	 */
 	public void addToInstantiated(String newClass){
 		if(!instantiated.contains(newClass))
 			instantiated.add(newClass);

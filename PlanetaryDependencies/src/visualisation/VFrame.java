@@ -31,7 +31,11 @@ public class VFrame extends JFrame {
 	public static void main(String[] args){
         VFrame frame = new VFrame("");
 	}
-	  
+	 
+	/**
+	 * Draws background on panel for frame
+	 *
+	 */
     protected class PaintPane extends JPanel {
     	Dimension d =new Dimension(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
     	@Override

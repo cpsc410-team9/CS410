@@ -24,7 +24,11 @@ public class ClassDependency {
 		colour = new Color(generateFloat(),generateFloat(),generateFloat());
 	}
 	
-	//floats between 60-255 ( for light colours)
+	/**
+	 * floats between 60-255 (for planet colours)
+	 * @return
+	 *float
+	 */
 	public float generateFloat(){
 	 double rand = Math.random();
 	 if(rand*255 > 100){
@@ -34,10 +38,12 @@ public class ClassDependency {
 	 }
 	}
 	
+	/**
+	 * line count for radius of planets
+	 */
 	public int planetaryRadius;
 
-	//to be used in the future
-	
+
 	public class Association{
 		public String associatedWith;
 		public int associationType;

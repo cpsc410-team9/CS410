@@ -42,7 +42,11 @@
 		Layout<StarVertex, String> starMapLayout;
 		Layout<ClassDependency, CustomEdge> solarSystemLayout;
 		String currentSolarSystem = "";
-	
+	/**
+	 *  Takes in list of ClassDependencies and outputs a graph
+	 * @param analyserOutput
+	 *void
+	 */
 		public void process(ArrayList<ClassDependency> analyserOutput) {
 	
 			System.out.println("\nVisualiser started.");
@@ -59,15 +63,21 @@
 			displayTextOutput(analyserOutput);
 			setupCanvas(analyserOutput);
 		}
-	
+	/**
+	 * Custom class for edges, contains the information for associations between vertices
+	 *
+	 */
 		private class CustomEdge {
 			String from;
 			String to;
 			int type;
 		}
 	
-		// Changes colour/size for planet/class vertices
-	
+	/**
+	 * Alters the planet vertices by changing the colour and size depending on its information
+	 * @param VisualizationViewer
+	 * @return void
+	 */
 		public void shapePlanetVertices(final VisualizationViewer<ClassDependency, CustomEdge> vv) {
 	
 			Transformer<ClassDependency, String> label = new Transformer<ClassDependency, String>() {
@@ -157,6 +167,12 @@
 			vv.getRenderContext().setVertexIconTransformer(highlightIcon);
 		}
 	
+		/**
+		 * Greys out everything but the selected vertices and their edges
+		 * @param VisualizationViewer
+		 * @param ClassDependency
+		 * 
+		 */
 		public void selectedPlanetVertices(final VisualizationViewer<ClassDependency, CustomEdge> vv, final ClassDependency cd) {
 			Transformer<ClassDependency, String> label = new Transformer<ClassDependency, String>() {
 				public String transform(ClassDependency i) {
@@ -267,7 +283,11 @@
 			vv.getRenderContext().setVertexIconTransformer(highlightIcon);
 		}
 	
-		// Changes colour/size for star/package vertices
+		/**
+		 * Alters the star vertices by changing the colour and size depending on its information
+		 * @param VisualizationViewer
+		 * @return void
+		 */
 		public void shapeStarVertices(VisualizationViewer<StarVertex, String> vv) {
 			Transformer<StarVertex, Paint> vertexPaint = new Transformer<StarVertex, Paint>() {
 				public Paint transform(StarVertex s) {
@@ -336,6 +356,11 @@
 			vv.setForeground(Color.lightGray);
 		}
 	
+		/**
+		 * Sets the star and solarsystem maps for the graphs
+		 * @param analyserOutput
+		 *void
+		 */
 		private void setupCanvas(final ArrayList<ClassDependency> analyserOutput) {
 			starMapLayout.setSize(GetDimension());
 			starView = new VisualizationViewer<StarVertex, String>(starMapLayout);
@@ -350,6 +375,11 @@
 			SetSwingValues();
 		}
 	
+		/**
+		 * Gets the current screen size
+		 * @return
+		 *Dimension
+		 */
 		private Dimension GetDimension(){
 			int width = (int) Screen.getPrimary().getBounds().getWidth();
 			int height = (int) Screen.getPrimary().getBounds().getHeight();
@@ -362,7 +392,11 @@
 			frame.getContentPane().add(starView);
 			frame.setVisible(true);
 		}
-	
+	/**
+	 *  adds handlers for mouse events
+	 * @param analyserOutput
+	 *void
+	 */
 		private void addHandlers(final ArrayList<ClassDependency> analyserOutput) {
 			DefaultModalGraphMouse<String, String> mouse = new DefaultModalGraphMouse<String, String>();
 			mouse.setMode(Mode.PICKING);
@@ -411,7 +445,9 @@
 				}
 			});
 			solarSystemView.addMouseListener(new MouseListener() {
-	
+	/**
+	 * Mouse clicking events for star map,
+	 */
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					if (e.getButton() == 3) {
@@ -451,6 +487,13 @@
 			});
 		}
 	
+		/**
+		 * 
+		 * when a star is clicked the respective solarsystem view will appear
+		 * @param vertex
+		 * @param list
+		 *void
+		 */
 		protected void graphSelectedClassSolarSystem(StarVertex vertex, ArrayList<ClassDependency> list) {
 			solarSystem = new SparseMultigraph<ClassDependency, CustomEdge>();
 	
@@ -485,6 +528,13 @@
 			frame.repaint();
 		}
 	
+		/**
+		 * 
+		 * @param associatedWith
+		 * @param list
+		 * @return
+		 *ClassDependency
+		 */
 		private ClassDependency findClassDependency(String associatedWith, ArrayList<ClassDependency> list) {
 			for (ClassDependency cd : list) {
 				if (cd.className.equals(associatedWith))
@@ -493,6 +543,11 @@
 			return null;
 		}
 	
+		/**
+		 * Displays the graph of packages
+		 * @param starVertices
+		 *void
+		 */
 		private void displayPackageGraph(ArrayList<StarVertex> starVertices) {
 			for (StarVertex sv : starVertices) {
 				starMap.addVertex(sv);
@@ -507,6 +562,13 @@
 	
 		}
 	
+		/**
+		 * Gets the package name of the star associated with it
+		 * @param associatedWith
+		 * @param starVertices
+		 * @return
+		 *StarVertex
+		 */
 		private StarVertex packageNameOf(String associatedWith, ArrayList<StarVertex> starVertices) {
 			for (StarVertex sv : starVertices) {
 				if (sv.starName.equals(associatedWith)) {
@@ -516,19 +578,10 @@
 			return null;
 		}
 	
-		/*
-		 * private static void drawClassGraph(ArrayList<ClassDependency> list) {
-		 * 
-		 * // populate vertices for (ClassDependency cd : list) {
-		 * //starMap.addVertex(cd.className); }
-		 * 
-		 * // populate edges for (ClassDependency cd : list) { for (Association a :
-		 * cd.associations) { String association = ""; switch (a.associationType) {
-		 * case 0: association = "COMPOSITION"; break; case 1: association =
-		 * "AGGREGATION"; break; case 2: association = "REALIZATION"; break; case 3:
-		 * association = "UNI-DIRECTIONAL ASSOCIATION"; break; case 4: association =
-		 * "BI-DIRECTIONAL ASSOCIATION"; break; } starMap.addEdge(cd.className + "-"
-		 * + a.associatedWith, cd.className, a.associatedWith); } } }
+		/**
+		 *  Text out put for our Visualiser
+		 * @param analyserOutput
+		 *void
 		 */
 		private static void displayTextOutput(ArrayList<ClassDependency> analyserOutput) {
 			for (ClassDependency cd : analyserOutput) {

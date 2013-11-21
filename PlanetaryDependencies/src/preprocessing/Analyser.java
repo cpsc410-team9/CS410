@@ -10,6 +10,12 @@ public class Analyser {
 
 	public static ArrayList<ClassPacket> allClassPackets = new ArrayList<ClassPacket>();
 
+	/**
+	 * Creates classDependency for each class
+	 * @param cp
+	 * @return
+	 *ClassDependency
+	 */
 	private static ClassDependency generateClassDependencyObject(
 			ClassPacket cp) {
 		ClassDependency classDependency = new ClassDependency(cp.className, cp.lineCount);
@@ -17,14 +23,18 @@ public class Analyser {
 		classDependency.packageName = cp.packageName;
 		
 		findCompositionDependency(cp, classDependency);
-//		findAggregationDependency(cp, classDependency);
 		findRealizationDependency(cp, classDependency);
 		findDirectionalAssocation(cp, classDependency);
 		
 		return classDependency;
 	}
 
-
+/**
+ * updates classDependency with Directional Associations
+ * @param packet
+ * @param classDependency
+ *void
+ */
 	private static void findDirectionalAssocation(ClassPacket packet,
 			ClassDependency classDependency) {
 		Association association;
@@ -46,7 +56,12 @@ public class Analyser {
 			classDependency.associations.add(association);
 	}
 }
-
+/**
+ * Updates ClassDependency with realization dependencies
+ * @param packet
+ * @param classDependency
+ *void
+ */
 	private static void findRealizationDependency(ClassPacket packet,
 			ClassDependency classDependency) {
 		Association association;
@@ -80,24 +95,7 @@ public class Analyser {
 			}
 			classDependency.associations.add(association);
 		}
-//		Association association;
-//		for(String dependentClass : packet.instantiated){
-//			association = classDependency.new Association();
-//			association.associatedWith = dependentClass;
-//			association.associationType = ClassDependency.COMPOSITION;
-//			classDependency.associations.add(association);
-//		}
-	}
-	
-//	public static void findAggregationDependency(ClassPacket packet, ClassDependency classDependency){
-//		Association association;
-//		for(String dependentClass : packet.assigned){
-//			association = classDependency.new Association();
-//			association.associatedWith = dependentClass;
-//			association.associationType = ClassDependency.AGGREGATION;
-//			classDependency.associations.add(association);
-//		}
-//	}
+		}
 
 	/**
 	 *  Sorts the instantiated classes for quicker searching
@@ -108,7 +106,7 @@ public class Analyser {
 		}
 	}
 
-	/**
+	/** Finds all the classes that instantiate the input class name
 	 * @param name (Class Name for which you want to find all other classes that instantiate this one)
 	 * @return ArrayList of the classes which instantiates the input class, the first element is the input class
 	 */
@@ -127,7 +125,12 @@ public class Analyser {
 		return listOfClasses;
 	}
 
-
+/**
+ * Outputs the dependencies
+ * @param parserOutput
+ * @return
+ *ArrayList<ClassDependency>
+ */
 	public static ArrayList<ClassDependency> analyse(ArrayList<ClassPacket> parserOutput) {
 		// TODO complete analysis tool. Feel free to use helper methods, submethods, custom classes, etc. 
 		// but this has to be the ultimate returning function.

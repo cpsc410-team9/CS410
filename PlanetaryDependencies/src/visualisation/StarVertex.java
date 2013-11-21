@@ -6,24 +6,39 @@ import preprocessing.ClassDependency;
 import preprocessing.ClassDependency.Association;
 
 public class StarVertex {
-	// This class is a custom vertex for star/package vertices,
-	// contains all the necessary fields for info to transform the vertices
+	/**
+	 *  This class is a custom vertex for star/package vertices,
+	 * contains all the necessary fields for info to transform the vertices
+	 */
 
 	String starName = "";
 	int starSize = 20;
 	ArrayList<Association> associations;
 	private static ArrayList<ClassDependency> classDependencyList;
-
+/**
+ * Constructor for this StarVertex
+ * @param name
+ * @param size
+ * @param aList
+ */
 	public StarVertex(String name, int size, ArrayList<Association> aList) {
 		starName = name;
 		starSize = size;
 		associations = aList;
 	}
 
+	/**
+	 * returns the name of the package/star
+	 */
 	public String toString() {
 		return starName;
 	}
-
+/**
+ * Retrieves all the classes associated with the star
+ * @param cList
+ * @return
+ *ArrayList<StarVertex>
+ */
 	public static ArrayList<StarVertex> classDependencyToStarVertex(ArrayList<ClassDependency> cList) {
 		int i = 0;
 		classDependencyList = cList;
@@ -54,6 +69,13 @@ public class StarVertex {
 		return stars;
 	}
 
+	/**
+	 * Finds the package name of the class dependencies
+	 * @param classAssList
+	 * @param packageName
+	 * @return
+	 *ArrayList<Association>
+	 */
 	public static ArrayList<Association> getPackageAssociations(ArrayList<Association> classAssList, String packageName) {
 		ArrayList<Association> aList = new ArrayList<Association>();
 		Association a = null;
@@ -71,7 +93,13 @@ public class StarVertex {
 		}
 		return aList;
 	}
-	
+
+	/**
+	 * Returns the number of classes in the package
+	 * @param packageName
+	 * @return
+	 *int
+	 */
 	public static int numberOfClassesInPackage(String packageName){ArrayList<ClassDependency> cdList = classDependencyList;
 		int num = 0;
 		for(ClassDependency cd: cdList){
