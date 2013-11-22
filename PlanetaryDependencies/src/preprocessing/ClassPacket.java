@@ -22,12 +22,16 @@ public class ClassPacket {
 		instantiated = new ArrayList<String>();
 		assigned = new ArrayList<String>();
 	}
+	/**
+	 * @param newClass
+	 *void
+	 */
 	public void addToAssociatedWith(String newClass){
 		if (!associatedWith.contains(newClass))
 			associatedWith.add(newClass);
 	}
 	/**
-	 * list of all the statically accessed classes in newClass
+	 * add newClass to list of all the statically accessed classes 
 	 * @param newClass
 	 *void
 	 */
@@ -37,7 +41,7 @@ public class ClassPacket {
 	}
 	
 	/**
-	 * list of classes that newClass instantiated
+	 * add newClass list of classes instantiated
 	 * @param newClass
 	 *void
 	 */
@@ -45,6 +49,11 @@ public class ClassPacket {
 		if(!instantiated.contains(newClass))
 			instantiated.add(newClass);
 	}
+	
+	/**
+	 * @param newClass Class added to assigned list
+	 *void
+	 */
 	public void addToAssigned(String newClass) {
 		if(!assigned.contains(newClass))
 			assigned.add(newClass);		

@@ -31,6 +31,13 @@ public class Parser {
 	ArrayList<ClassPacket> parsedList = new ArrayList<ClassPacket>();
 	ArrayList<String> classList = new ArrayList<String>();
 	
+	/**
+	 * Parses file and returns a list of classPackets to be used in analyzer
+	 * @param file
+	 * @return
+	 * @throws FileNotFoundException
+	 *ArrayList<ClassPacket>
+	 */
 	public ArrayList<ClassPacket> parse(File file) throws FileNotFoundException{
 		System.out.println("Parser started.");
 
@@ -56,9 +63,12 @@ public class Parser {
 
 	}
 
-
+/**
+ * Looks for folders with Java files
+ * @param file
+ *void
+ */
 	private void scanFolder(File file){
-        //System.out.println("scan folder");
 		if(!file.isDirectory()&&file.getName().endsWith(".java")){
 			String className = file.getName().split("\\.")[0];
 			if(!classList.contains(className))
@@ -72,6 +82,11 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * Gets all the files in the folder ending in .java and parses those
+	 * @param file
+	 *void
+	 */
 	private void parseFolder(File file){
 		if(!file.isDirectory()&&file.getName().endsWith(".java")){
 			parseJavaFile(file);
@@ -84,6 +99,11 @@ public class Parser {
 		}
 	}
 	
+	/**
+	 * Parses files in order to find associations to be analyzed in analyzer
+	 * @param javaClassFile, file to be parsed
+	 *void
+	 */
 	private void parseJavaFile(File javaClassFile) {
 		try {
 			CompilationUnit cu = JavaParser.parse(javaClassFile);
@@ -91,16 +111,6 @@ public class Parser {
 					new ClassPacket(javaClassFile.getName().split("\\.")[0], 
 							cu.getPackage().getName().toString(), 
 							cu.getEndLine());
-			
-			//i think this is no longer necessary
-//			//Import adding
-//			List<ImportDeclaration> imports = cu.getImports();
-//			for(ImportDeclaration i : imports){
-//				if(existsInList(i.getName().getName(),classList)){
-//					cp.addToDependency(i.getName().getName());
-//				}
-//			}
-			//run visitor
 			VariableVisitor vv = new VariableVisitor();
 			List<TypeDeclaration> f_vars = cu.getTypes();
 			for (TypeDeclaration type : f_vars)
@@ -210,17 +220,12 @@ public class Parser {
 		ArrayList<String> assignment = new ArrayList<String>();
 		@Override
 		public void visit(VariableDeclarationExpr n, Object arg)
-		{      
-//			if(n.toString().matches("(?s).*\\bnew\\b"+n.getType().toString()+"[^A-Za-z0-9]].*")||
-//					n.toString().matches("(?s).*\\.new\\b.*")){
-//				instantiated.add(n.getType().toString());
-//			}
-//			else 
+		{  
 				instantiated.add(n.getType().toString());
 		}
 	}
 	
-	 public class MethodVisitor extends VoidVisitorAdapter {
+	public class MethodVisitor extends VoidVisitorAdapter {
 		 ArrayList<String> methodsParams = new ArrayList<String>();
 		 ArrayList<String> methods = new ArrayList<String>();
 
@@ -235,6 +240,13 @@ public class Parser {
 	        }
 	  }
 	 
+	 /**
+	  * Checks if name of class already exists in the list, returns true if it is.
+	  * @param name
+	  * @param classList
+	  * @return
+	  *boolean
+	  */
 	private static boolean existsInList(String name, ArrayList<String> classList) {
 		for(String s : classList){
 			if(name.equals(s))

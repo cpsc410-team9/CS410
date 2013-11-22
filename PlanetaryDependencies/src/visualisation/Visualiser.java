@@ -115,7 +115,7 @@
 					}
 				}
 			};
-			Transformer<ClassDependency, Icon> highlightIcon = new Transformer<ClassDependency, Icon>(){
+			Transformer<ClassDependency, Icon> planetIcon = new Transformer<ClassDependency, Icon>(){
 				@Override
 				public Icon transform(final ClassDependency c) {
 					final int radius = c.lineCount/20;
@@ -134,14 +134,12 @@
 						@Override
 						public void paintIcon(Component arg0, Graphics g, int x, int y) {
 							Graphics2D g2 = (Graphics2D)g;
-							g2.setColor(c.colour);
+						    GradientPaint p= new GradientPaint(5, 25, c.colour.darker().darker().darker(), 2, 2, c.colour, true);
+						    g2.setPaint(p);
 							g2.fillOval(x,y,radius,radius);
 							try{
 								if(c.packageName.equals(currentSolarSystem)){
-									//change outline colour in next line
 									g2.setColor(Color.YELLOW);
-									//RadialGradientPaint gp = new RadialGradientPaint(x+(radius/2), y+(radius/2), radius, new float[] { 0.0f, 1f }, new Color[] {Color.blue, Color.white});
-									//g2.setPaint(gp);
 									float outline = (float) (radius*(0.1) > 5? radius*(0.1) : 5f);
 									g2.setStroke(new BasicStroke(outline));
 								}
@@ -164,7 +162,7 @@
 			vv.getRenderer().getVertexLabelRenderer().setPosition(Position.N);
 			vv.setBackground(Color.black);
 			vv.setForeground(Color.white);
-			vv.getRenderContext().setVertexIconTransformer(highlightIcon);
+			vv.getRenderContext().setVertexIconTransformer(planetIcon);
 		}
 	
 		/**
@@ -216,7 +214,7 @@
 					else return Color.gray;
 				}
 			};
-			Transformer<ClassDependency, Icon> highlightIcon = new Transformer<ClassDependency, Icon>(){
+			Transformer<ClassDependency, Icon> planetIcon = new Transformer<ClassDependency, Icon>(){
 	
 				@Override
 				public Icon transform(final ClassDependency c) {
@@ -237,14 +235,13 @@
 						public void paintIcon(Component arg0, Graphics g, int x, int y) {
 							if(c.className.equals(cd.className)){
 								Graphics2D g2 = (Graphics2D) g;
-								g2.setColor(c.colour);
+
+							    GradientPaint p= new GradientPaint(5, 25, c.colour.darker().darker().darker(), 2, 2, c.colour, true);
+							    g2.setPaint(p);
 								g2.fillOval(x,y,radius,radius);
 								try{
 									if(c.packageName.equals(currentSolarSystem)){
-										//change outline colour in next line
 										g2.setColor(Color.RED);
-										//									RadialGradientPaint gp = new RadialGradientPaint(x+(radius/2), y+(radius/2), radius, new float[] { 0.0f, 1f }, new Color[] {Color.blue, Color.white});
-										//									g2.setPaint(gp);
 										float outline = (float) (radius*(0.1) > 5 ? radius*(0.1) : 5f);
 										g2.setStroke(new BasicStroke(outline));
 									}
@@ -280,7 +277,7 @@
 			vv.setBackground(Color.black);
 			vv.setForeground(Color.white);
 	
-			vv.getRenderContext().setVertexIconTransformer(highlightIcon);
+			vv.getRenderContext().setVertexIconTransformer(planetIcon);
 		}
 	
 		/**
