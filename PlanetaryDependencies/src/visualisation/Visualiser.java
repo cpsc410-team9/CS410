@@ -1,36 +1,39 @@
 	package visualisation;
 	
 	import edu.uci.ics.jung.algorithms.layout.*;
-	import edu.uci.ics.jung.graph.Graph;
-	import edu.uci.ics.jung.graph.SparseMultigraph;
-	import edu.uci.ics.jung.graph.util.EdgeType;
-	import edu.uci.ics.jung.visualization.VisualizationServer;
-	import edu.uci.ics.jung.visualization.VisualizationViewer;
-	import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
-	import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
-	import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
-	import edu.uci.ics.jung.visualization.picking.PickedState;
-	import edu.uci.ics.jung.visualization.renderers.GradientVertexRenderer;
-	import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
-	import javafx.stage.Screen;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.SparseMultigraph;
+import edu.uci.ics.jung.graph.util.EdgeType;
+import edu.uci.ics.jung.visualization.VisualizationServer;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
+import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
+import edu.uci.ics.jung.visualization.picking.PickedState;
+import edu.uci.ics.jung.visualization.renderers.GradientVertexRenderer;
+import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
+import javafx.stage.Screen;
 	
 	import org.apache.commons.collections15.Transformer;
 	
 	import preprocessing.ClassDependency;
-	import preprocessing.ClassDependency.Association;
-	import preprocessing.ClassPacket;
+import preprocessing.ClassDependency.Association;
+import preprocessing.ClassPacket;
 	
-	import javax.swing.*;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 	
 	import java.awt.*;
-	import java.awt.event.ItemEvent;
-	import java.awt.event.ItemListener;
-	import java.awt.event.MouseEvent;
-	import java.awt.event.MouseListener;
-	import java.awt.geom.AffineTransform;
-	import java.awt.geom.Ellipse2D;
-	import java.util.ArrayList;
-	import java.util.Collection;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 	public class Visualiser {
 		JFrame frame = new JFrame("Visualiser");
 		public ClassPacket test;
@@ -378,7 +381,7 @@
 		 *Dimension
 		 */
 		private Dimension GetDimension(){
-			int width = (int) Screen.getPrimary().getBounds().getWidth();
+			int width = (int) Screen.getPrimary().getBounds().getWidth()-200;
 			int height = (int) Screen.getPrimary().getBounds().getHeight();
 			return new Dimension(width, height);
 		}
@@ -493,7 +496,8 @@
 		 */
 		protected void graphSelectedClassSolarSystem(StarVertex vertex, ArrayList<ClassDependency> list) {
 			solarSystem = new SparseMultigraph<ClassDependency, CustomEdge>();
-	
+			frame.setLayout(null);
+			frame.getContentPane().setBackground(Color.BLACK);
 			for (ClassDependency cd : list) {
 				if (cd.packageName.equals(vertex.toString())) {
 					solarSystem.addVertex(cd);
@@ -517,12 +521,26 @@
 					}
 				}
 			}
-			solarSystem.addVertex(new ClassDependency(currentSolarSystem, 500));
+			solarSystem.addVertex(new ClassDependency(currentSolarSystem, 2000));
 			solarSystemLayout.setGraph(solarSystem);
 			solarSystemView.setGraphLayout(solarSystemLayout);
 			frame.getContentPane().remove(starView);
 			frame.getContentPane().add(solarSystemView);
-			frame.repaint();
+			try {
+				   Image image = ImageIO.read(new File(System.getProperty("user.dir")+"//resources//legend2.png"));
+				   JLabel jl = new JLabel();
+				   image = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+				   jl.setIcon(new ImageIcon(image));
+				   jl.setBounds(new Rectangle(200,200));
+				   jl.setLocation((int)Screen.getPrimary().getBounds().getWidth()-200,100);
+				   frame.getContentPane().add(jl);
+
+				  } catch (IOException e) {
+				   // TODO Auto-generated catch block
+				   e.printStackTrace();
+				  }
+				  frame.revalidate();
+				  frame.repaint();
 		}
 	
 		/**
