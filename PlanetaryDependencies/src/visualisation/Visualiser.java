@@ -527,7 +527,7 @@ import java.util.Collection;
 			frame.getContentPane().remove(starView);
 			frame.getContentPane().add(solarSystemView);
 			try {
-				   Image image = ImageIO.read(new File(System.getProperty("user.dir")+"//resources//legend2.png"));
+				   Image image = ImageIO.read(new File(System.getProperty("user.dir")+"//resources//legend3.png"));
 				   JLabel jl = new JLabel();
 				   image = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
 				   jl.setIcon(new ImageIcon(image));
