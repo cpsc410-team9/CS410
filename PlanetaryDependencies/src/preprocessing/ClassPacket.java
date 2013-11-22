@@ -52,7 +52,7 @@ public class ClassPacket {
 	
 	/**
 	 * @param newClass Class added to assigned list
-	 *void
+	 * @return void
 	 */
 	public void addToAssigned(String newClass) {
 		if(!assigned.contains(newClass))
