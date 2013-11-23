@@ -12,8 +12,8 @@ public class ClassDependency {
 	public final static int BIDIRECTIONAL_ASSOCIATION = 4;
 	public int lineCount =0;
 
-	public String className;
-	public String packageName;
+	public String className="";
+	public String packageName="";
 	public ArrayList<Association> associations;
 	public Color colour;
 	
