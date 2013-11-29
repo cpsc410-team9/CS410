@@ -31,8 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 public class Visualiser {
 	JFrame frame = new JFrame("Visualiser");
-	public ClassPacket test;
-	public Graph<StarVertex, String> starMap;
+    public Graph<StarVertex, String> starMap;
 	public Graph<ClassDependency, CustomEdge> solarSystem;
 	VisualizationViewer<StarVertex, String> starView;
 	VisualizationViewer<ClassDependency, CustomEdge> solarSystemView;
@@ -555,7 +554,6 @@ public class Visualiser {
 			frame.getContentPane().add(jl);
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		frame.revalidate();

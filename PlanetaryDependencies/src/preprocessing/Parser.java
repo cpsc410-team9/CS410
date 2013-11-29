@@ -41,7 +41,6 @@ public class Parser {
 	public ArrayList<ClassPacket> parse(File file) throws FileNotFoundException{
 		System.out.println("Parser started.");
 
-
 		// Complete parsing method here
 		//from project, find the src folder containing packages
 		System.out.println("Folder selected: "+file.getAbsolutePath());
@@ -64,9 +63,8 @@ public class Parser {
 	}
 
 /**
- * Looks for folders with Java files
+ * Depth First Search.  Gets All Java Files and Adds them to an ArrayList
  * @param file
- *void
  */
 	private void scanFolder(File file){
 		if(!file.isDirectory()&&file.getName().endsWith(".java")){
@@ -247,7 +245,7 @@ public class Parser {
 	  * @return
 	  *boolean
 	  */
-	private static boolean existsInList(String name, ArrayList<String> classList) {
+	public static boolean existsInList(String name, ArrayList<String> classList) {
 		for(String s : classList){
 			if(name.equals(s))
                 return true;

@@ -22,7 +22,6 @@ public class Main extends Application {
 	}
 
 
-	//JavaFX Start Method
 	@Override
 	public void start(Stage stage) throws Exception {
 
@@ -33,17 +32,11 @@ public class Main extends Application {
 		ArrayList<ClassDependency> analyserOutput = Analyser.analyse(parserOutput);
 
 		v.process(analyserOutput);
-		
-		//Shuts down application. Needs Work.
-        //System.exit(0);
+
 	}
 
     //Helper, Gets Directory of Code to be Analyzed.
-    private String GetTargetCodePath(){
-//        String currentDir = System.getProperty("user.dir");
-//        String targetRelativePath = "\\Target\\Leviathan";
-//        return currentDir + targetRelativePath;
-
+    public static String GetTargetCodePath(){
           File currDir = new File(System.getProperty("user.dir"));
           File parentFile = currDir.getParentFile();
           String targetRelativePath = "\\Target\\Leviathan";

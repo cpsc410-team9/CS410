@@ -51,8 +51,6 @@ public class Analyser {
 					};
 				}
 			}
-			
-			
 			classDependency.associations.add(association);
 	}
 }
@@ -132,8 +130,6 @@ public class Analyser {
  *ArrayList<ClassDependency>
  */
 	public static ArrayList<ClassDependency> analyse(ArrayList<ClassPacket> parserOutput) {
-		// TODO complete analysis tool. Feel free to use helper methods, submethods, custom classes, etc. 
-		// but this has to be the ultimate returning function.
 		System.out.println("Analyser started.");
 		for(ClassPacket cp : parserOutput){
 			allClassPackets.add(cp);
